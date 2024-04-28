@@ -11,6 +11,8 @@ namespace WasHere.Database
         public string? UserName { get; set; }
         public string? Password { get; set; }
         public string? ActivationKey { get; set; }
+        public string? IpAddress { get; set; }
+        public string? PcName { get; set; }
     }
 
     public class DatabaseContext : DbContext
@@ -28,7 +30,7 @@ namespace WasHere.Database
             }
         }
 
-        //Scaffold-DbContext "Server=45.88.108.162;Port=3306;Database=db_240335;Uid=db_240335;Pwd=WLzrpDowbQVxm5BhEdW0;" Pomelo.EntityFrameworkCore.MySql -OutputDir Models
+        //Add-Migration InitialCreate
 
 
         public async Task AddUserAsync(User user)

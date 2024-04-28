@@ -40,8 +40,8 @@
 
         <!--User Title-->
 
-        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="135">
-            <TextBlock x:Name="UserTitle" FontFamily="{StaticResource PoppinsLight}" FontSize="12" FontStyle="Italic" Foreground="LightGray" Height="53" Width="137"/>
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+            <TextBlock x:Name="UserTitle" FontFamily="{StaticResource PoppinsLight}" FontSize="12" FontStyle="Italic" Foreground="LightGray" Height="70" Width="130"/>
 
         </StackPanel>
 

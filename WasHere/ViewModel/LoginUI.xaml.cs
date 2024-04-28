@@ -14,6 +14,8 @@ namespace WasHere.ViewModel
             InitializeComponent();
         }
 
+
+
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             string username = UserTextBox.Text;
