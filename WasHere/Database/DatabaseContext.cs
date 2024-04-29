@@ -32,7 +32,6 @@ namespace WasHere.Database
 
         //Add-Migration InitialCreate
 
-
         public async Task AddUserAsync(User user)
         {
             await Users.AddAsync(user);

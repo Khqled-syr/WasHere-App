@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using WasHere.Database;
 
 namespace WasHere.ViewModel
@@ -16,11 +17,15 @@ namespace WasHere.ViewModel
             version: "1.0"
 );
 
+
+        private int currentIndex;
+        private string? outputText;
+
+
         public RegistrationPage()
         {
             InitializeComponent();
         }
-
 
         private async void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
@@ -36,18 +41,14 @@ namespace WasHere.ViewModel
                 string ipAddress = await GetPublicIpAddressAsync();
                 string pcName = Environment.MachineName;
 
-
-
-                OutputTextBlock.Text = ""; // Clear previous messages
+                ClearOutput();
 
 
                 if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(activationKey))
                 { 
 
                     
-                    OutputTextBlock.Text += "Please enter all required fields.";
-                    await Task.Delay(2500);
-                    OutputTextBlock.Text = "";
+                    SetOutput("Please enter all required fields.");
                     return;
                 
                 }
@@ -72,22 +73,13 @@ namespace WasHere.ViewModel
 
                         if (existingUser != null)
                         {
-                            OutputTextBlock.Text += "User already exists!";
-                            await Task.Delay(2500);
-                            OutputTextBlock.Text = "";
+                            SetOutput("User already exists!");
                             return;
                         }
 
-
                         //MessageBox.Show("Registration successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                        OutputTextBlock.Text += "Registration successful!\n";
+                        SetOutput($"Registration successful!\n\nUser: {newUser.UserName}\nPassword: {newUser.Password}");
                         await dbContext.AddUserAsync(newUser);
-                        await Task.Delay(5000);
-                        OutputTextBlock.Text = "";
-                        OutputTextBlock.Text += $"User: {newUser.UserName}\n";
-                        OutputTextBlock.Text += $"Password: {newUser.Password}";
-                        await Task.Delay(3000);
-                        OutputTextBlock.Text = "";
                         UsernameTextBox.Clear();
                         PasswordBox.Clear();
                         KeyTextBox.Clear();  
@@ -97,22 +89,51 @@ namespace WasHere.ViewModel
                 else
                 {
                     //MessageBox.Show("Invalid activation key. Please check and try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    OutputTextBlock.Text += "Invalid activation key. Please check and try again.";
+                    SetOutput("Invalid activation key. Please check and try again.");
                     KeyTextBox.Clear();
-                    await Task.Delay(2500);
-                    OutputTextBlock.Text = "";
                 }
             }
             catch(Exception ex)
             {
                 LogError(ex);
                 //MessageBox.Show("An error occurred. Please try again later.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                OutputTextBlock.Text += "An error occurred. Please try again later.";
-                await Task.Delay(2500);
-                OutputTextBlock.Text = "";
+                SetOutput("An error occurred. Please try again later.");
 
             }
         }
+
+
+        private void ClearOutput()
+        {
+            OutputTextBlock.Text = "";
+            currentIndex = 0;
+            outputText = "";
+        }
+
+        private async void SetOutput(string text)
+        {
+            ClearOutput();
+            outputText = text;
+            await TypeTextAsync();
+        }
+
+        private async void AppendOutput(string text)
+        {
+            outputText = text;
+            await TypeTextAsync();
+        }
+
+        private async Task TypeTextAsync()
+        {
+            while (currentIndex < outputText.Length)
+            {
+                OutputTextBlock.Text += outputText[currentIndex];
+                currentIndex++;
+                await Task.Delay(50); // Adjust typing speed here
+            }
+        }
+
+
 
         private void LogError(Exception ex)
         {

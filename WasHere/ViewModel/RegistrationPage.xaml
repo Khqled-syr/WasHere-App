@@ -20,9 +20,9 @@
 
 
         <!--Output Title-->
-        <TextBlock Text="Output" FontSize="24" HorizontalAlignment="Right" FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White" Margin="0,113,89,301"/>
+        <TextBlock Text="Output" FontSize="24" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White" Margin="0,113,89,301"/>
 
-        <Border BorderBrush="White" BorderThickness="1" Margin="550,154,10,146" Padding="10" CornerRadius="20">
+        <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Center" Margin="550,154,12,146" Padding="10" CornerRadius="20">
             <TextBlock x:Name="OutputTextBlock" VerticalAlignment="Center" TextWrapping="Wrap" FontFamily="{StaticResource Poppins}" FontSize="16" Foreground="White" RenderTransformOrigin="0.5,0.5" Height="120">
                 <TextBlock.RenderTransform>
                     <TransformGroup>
@@ -36,15 +36,15 @@
         </Border>
 
 
+        <!-- Separator line -->
+        <Separator VerticalAlignment="Top" Height="2" Background="White" Margin="0,76,0,0"/>
+
         <!-- Main content -->
         <Grid VerticalAlignment="Center">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-
-            <!-- Separator line -->
-            <Separator VerticalAlignment="Top" Height="2" Background="White" Margin="0,10,0,0"/>
 
 
 

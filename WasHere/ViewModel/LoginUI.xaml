@@ -32,38 +32,55 @@
     <Grid>
 
         <!-- Title -->
-        <StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,40,10,0">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,40,10,0">
             <Icon:PackIconMaterial Kind="Tools" Foreground="White" Margin="225,10,0,-30" Height="19" Width="25"/>
             <TextBlock Text="WasHere Tweaker" FontSize="24"  FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White"/>
         </StackPanel>
 
         <!-- Minimize Button -->
-        <StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,40,0">
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,40,0">
             <Button Width="33" Background="Transparent" Foreground="Transparent" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" Click="MinimizeButton_Click" Height="26">
                 <Icon:PackIconMaterial Kind="Minus" Foreground="White" Background="Transparent"/>
             </Button>
         </StackPanel>
 
         <!-- Close Button -->
-        <StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,10,0">
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,10,0">
             <Button Width="33" Background="Transparent" Foreground="Transparent" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right" Click="CloseAppBtn_Click" Height="26">
                 <Icon:PackIconMaterial Kind="Close" Foreground="Gray" Background="Transparent"/>
             </Button>
         </StackPanel>
 
+        <!-- Output Title -->
+        <TextBlock Text="Output" FontSize="24" HorizontalAlignment="Right" VerticalAlignment="Top" FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White" Margin="0,117,88,0"/>
+
+        <!-- Output Border -->
+        <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Center" Margin="550,154,12,146" Padding="10" CornerRadius="20">
+            <TextBlock x:Name="OutputTextBlock" VerticalAlignment="Center" TextWrapping="Wrap" FontFamily="{StaticResource Poppins}" FontSize="16" Foreground="White" RenderTransformOrigin="0.5,0.5" Height="120">
+                <TextBlock.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="1"/>
+                        <SkewTransform AngleY="-0.17"/>
+                        <RotateTransform Angle="360.084"/>
+                        <TranslateTransform X="-0.001" Y="-0.351"/>
+                    </TransformGroup>
+                </TextBlock.RenderTransform>
+            </TextBlock>
+        </Border>
+
+        <!-- Separator line -->
+        <Separator VerticalAlignment="Top" Height="2" Background="White" Margin="0,76,0,0"/>
+
         <!-- Main content -->
-        <Grid Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">
+        <Grid VerticalAlignment="Center">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- Separator line -->
-            <Separator VerticalAlignment="Top" Height="2" Background="White" Margin="0,10,0,0"/>
-
             <!-- Login and Password -->
-            <StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Center" Margin="0,50,0,0">
-                <TextBlock Text="Login" FontFamily="{StaticResource Poppins}" FontWeight="Bold" FontSize="16" Foreground="White" Margin="0,0,0,5"/>
+            <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center" Margin="0,25,0,25">
+                <TextBlock Text="Username" FontFamily="{StaticResource Poppins}" FontWeight="Bold" FontSize="16" Foreground="White" Margin="0,0,0,5"/>
                 <TextBox x:Name="UserTextBox" FontFamily="{StaticResource Poppins}" FontSize="16" Background="#33FFFFFF" Foreground="White" Padding="5" BorderThickness="0" Width="200" Height="30" Margin="0,0,0,10"/>
 
                 <TextBlock Text="Password" FontFamily="{StaticResource Poppins}" FontWeight="Bold" FontSize="16" Foreground="White" Margin="0,0,0,5"/>
@@ -71,7 +88,7 @@
 
                 <!-- Login and Register Buttons -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
-                    <Button Content="Login" FontFamily="{StaticResource Poppins}" Click="LoginButton_Click" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Margin="5"/>
+                    <Button x:Name="LoginButton" Content="Login" FontFamily="{StaticResource Poppins}" Click="LoginButton_Click" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Margin="5"/>
                     <Button Content="Register" FontFamily="{StaticResource Poppins}" Click="RegisterButton_Click" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Margin="5"/>
                 </StackPanel>
             </StackPanel>
