@@ -1,9 +1,12 @@
 ﻿using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using WasHere.Database;
 using WasHere.Utils;
+using System.Security.Cryptography;
+
 
 namespace WasHere.ViewModel
 {
@@ -25,6 +28,7 @@ namespace WasHere.ViewModel
         public RegistrationPage()
         {
             InitializeComponent();
+            GenerateEncryptionKey();
 
         }
 
@@ -64,12 +68,6 @@ namespace WasHere.ViewModel
                     return;
                 }
 
-                await Task.Run(() =>
-                {
-                    // Perform the initialization
-                    KeyAuthApp.init();
-                });
-
 
                 if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(activationKey))
                 {
@@ -77,8 +75,39 @@ namespace WasHere.ViewModel
                     SetOutput("Please enter all required fields.");
                     EnableSubmitButton();
                     return;
-
                 }
+
+
+                if (password.Length < 8)
+                {
+                    SetOutput("Password must be at least 8 characters long.");
+                    EnableSubmitButton();
+                    return;
+                }
+
+
+
+                // Check if password is compromised
+                if (await IsPasswordCompromised(password))
+                {
+                    SetOutput("Password has been compromised. Please choose a different one.");
+                    EnableSubmitButton();
+                    return;
+                }
+
+
+                string encryptedPassword = EncryptPassword(password);
+
+
+
+                await Task.Run(() =>
+                {
+                    // Perform the initialization
+                    KeyAuthApp.init();
+                });
+
+
+
                 KeyAuthApp.license(activationKey);
 
                 if (!KeyAuthApp.response.success)
@@ -122,6 +151,98 @@ namespace WasHere.ViewModel
                 SetOutput("An error occurred. Please try again later.");
                 EnableSubmitButton();
                 return;
+            }
+        }
+
+        private string EncryptPassword(string password)
+        {
+            // AES encryption key (32 bytes for AES256)
+            byte[] key = Encoding.UTF8.GetBytes("YOUR_ENCRYPTION_KEY_HERE");
+            // AES initialization vector (16 bytes for AES256)
+            byte[] iv = Encoding.UTF8.GetBytes("YOUR_INITIALIZATION_VECTOR_HERE");
+
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = key;
+                aesAlg.IV = iv;
+
+                // Create an encryptor to perform the stream transform.
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                // Create the streams used for encryption.
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            // Write all data to the stream.
+                            swEncrypt.Write(password);
+                        }
+                        return Convert.ToBase64String(msEncrypt.ToArray());
+                    }
+                }
+            }
+        }
+
+        private static void GenerateEncryptionKey()
+        {
+            byte[] key = new byte[32]; // 32 bytes = 256 bits
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                rng.GetBytes(key);
+            }
+
+            // Generate a random IV (16 bytes for AES)
+            byte[] iv = new byte[16];
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                rng.GetBytes(iv);
+            }
+
+            // Convert the key and IV to Base64-encoded strings for storage or transmission
+            string base64Key = Convert.ToBase64String(key);
+            string base64IV = Convert.ToBase64String(iv);
+
+            Console.WriteLine("Encryption Key: " + base64Key);
+            Console.WriteLine("Initialization Vector (IV): " + base64IV);
+        }
+
+
+        private async Task<bool> IsPasswordCompromised(string password)
+        {
+            // Use "Have I Been Pwned" API to check if the password is compromised
+            // Example using HttpClient:
+            HttpClient client = new HttpClient();
+            string apiUrl = "https://api.pwnedpasswords.com/range/";
+            string hash = CalculateSHA1Hash(password);
+            string prefix = hash.Substring(0, 5);
+            string suffix = hash.Substring(5);
+            HttpResponseMessage response = await client.GetAsync(apiUrl + prefix);
+            if (response.IsSuccessStatusCode)
+            {
+                string responseContent = await response.Content.ReadAsStringAsync();
+                return responseContent.Contains(suffix.ToUpper());
+            }
+            else
+            {
+                // Handle API error
+                return false;
+            }
+        }
+
+        private string CalculateSHA1Hash(string input)
+        {
+            using (SHA1Managed sha1 = new SHA1Managed())
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes(input);
+                byte[] hash = sha1.ComputeHash(bytes);
+                StringBuilder stringBuilder = new StringBuilder();
+                foreach (byte b in hash)
+                {
+                    stringBuilder.Append(b.ToString("X2"));
+                }
+                return stringBuilder.ToString();
             }
         }
 
