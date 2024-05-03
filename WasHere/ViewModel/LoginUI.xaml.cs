@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using WasHere.Database;
-using Windows.System;
 
 namespace WasHere.ViewModel
 {
@@ -52,6 +50,7 @@ namespace WasHere.ViewModel
 
                     MainUI mainUI = new MainUI();
                     mainUI.Show();
+                    //ApplyAnimation(mainUI);
                     this.Close();
                 }
                 else

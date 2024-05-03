@@ -29,6 +29,8 @@
     <Window.Style>
         <StaticResource ResourceKey="RoundedWindowStyle"/>
     </Window.Style>
+    
+    
 
     <Grid>
         <!-- Title -->

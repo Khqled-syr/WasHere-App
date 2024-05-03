@@ -2,8 +2,8 @@
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
 using WasHere.Database;
+using WasHere.Utils;
 
 namespace WasHere.ViewModel
 {
@@ -12,9 +12,9 @@ namespace WasHere.ViewModel
     {
         public static Api KeyAuthApp = new Api(
             name: "WasHere", // Application Name
-            ownerid: "6l9dTVjpxN", // Owner ID
-            secret: "1d0e6bdb8f14135f0d681d1e52eb994b23d5b36533e34515b1125fa472217355",
-            version: "1.0"
+            ownerid: "lYgBCNDiV1", // Owner ID
+            secret: "f3a1cd3b7a23189aa43c700cba35f5413c8d30d84b2ed327d86d1a0e60ed6e87", // Application Secret
+            version: "1.0" // Application Version, /*
 );
 
 
@@ -25,6 +25,7 @@ namespace WasHere.ViewModel
         public RegistrationPage()
         {
             InitializeComponent();
+
         }
 
         private async void SubmitButton_Click(object sender, RoutedEventArgs e)
@@ -32,7 +33,7 @@ namespace WasHere.ViewModel
             try
             {
 
-                KeyAuthApp.init();
+                SumbitButton.IsEnabled = false;
 
                 // Get user input from the text boxes
                 string username = UsernameTextBox.Text;
@@ -41,23 +42,52 @@ namespace WasHere.ViewModel
                 string ipAddress = await GetPublicIpAddressAsync();
                 string pcName = Environment.MachineName;
 
+
                 ClearOutput();
 
 
-                if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(activationKey))
-                { 
-
-                    
-                    SetOutput("Please enter all required fields.");
+                // Check if IP address is null
+                if (string.IsNullOrEmpty(ipAddress))
+                {
+                    SetOutput("Something unexpected went wrong. Please try again later.");
+                    EnableSubmitButton();
                     return;
-                
                 }
 
-                KeyAuthApp.license(activationKey);           
+                //VPN CHECKER
+                bool isVpnUsed = await VpnChecker.IsVpnUsed(ipAddress);
 
-                if (KeyAuthApp.response.success)
+                if (isVpnUsed || CloudflareChecker.IsCloudflareWarpEnabled())
+                {
+                    SetOutput("Please disable your VPN connection before registering.");
+                    EnableSubmitButton();
+                    return;
+                }
+
+                await Task.Run(() =>
+                {
+                    // Perform the initialization
+                    KeyAuthApp.init();
+                });
+
+
+                if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(activationKey))
                 {
 
+                    SetOutput("Please enter all required fields.");
+                    EnableSubmitButton();
+                    return;
+
+                }
+                KeyAuthApp.license(activationKey);
+
+                if (!KeyAuthApp.response.success)
+                {
+                    SetOutput("Invalid activation key. Please check and try again.");
+                    KeyTextBox.Clear();
+                    EnableSubmitButton();
+                    return;
+                }
                     User newUser = new User
                     {
                         UserName = username,
@@ -74,32 +104,32 @@ namespace WasHere.ViewModel
                         if (existingUser != null)
                         {
                             SetOutput("User already exists!");
+                        EnableSubmitButton();
                             return;
                         }
 
-                        //MessageBox.Show("Registration successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                         SetOutput($"Registration successful!\n\nUser: {newUser.UserName}\nPassword: {newUser.Password}");
                         await dbContext.AddUserAsync(newUser);
                         UsernameTextBox.Clear();
                         PasswordBox.Clear();
-                        KeyTextBox.Clear();  
+                        KeyTextBox.Clear();
+                        SumbitButton.IsEnabled = false;
                     }
-                }
-
-                else
-                {
-                    //MessageBox.Show("Invalid activation key. Please check and try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    SetOutput("Invalid activation key. Please check and try again.");
-                    KeyTextBox.Clear();
-                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogError(ex);
-                //MessageBox.Show("An error occurred. Please try again later.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 SetOutput("An error occurred. Please try again later.");
-
+                EnableSubmitButton();
+                return;
             }
+        }
+
+        private async void EnableSubmitButton()
+        {
+            // Delay for a short period before enabling the button to prevent spamming
+            await Task.Delay(1000); // Adjust the delay time as needed
+            SumbitButton.IsEnabled = true;
         }
 
 

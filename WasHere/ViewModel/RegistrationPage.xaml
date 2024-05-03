@@ -19,9 +19,10 @@
         </StackPanel>
 
 
-        <!--Output Title-->
-        <TextBlock Text="Output" FontSize="24" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White" Margin="0,113,89,301"/>
+        <!-- Output Title -->
+        <TextBlock Text="Output" FontSize="24" HorizontalAlignment="Right" VerticalAlignment="Top" FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White" Margin="0,117,88,0"/>
 
+        <!-- Output Border -->
         <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Center" Margin="550,154,12,146" Padding="10" CornerRadius="20">
             <TextBlock x:Name="OutputTextBlock" VerticalAlignment="Center" TextWrapping="Wrap" FontFamily="{StaticResource Poppins}" FontSize="16" Foreground="White" RenderTransformOrigin="0.5,0.5" Height="120">
                 <TextBlock.RenderTransform>
@@ -61,7 +62,7 @@
 
                 <!-- Submit Button -->
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
-                    <Button Content="Submit" FontFamily="{StaticResource Poppins}" Click="SubmitButton_Click" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Margin="5"/>
+                    <Button x:Name="SumbitButton" Content="Submit" FontFamily="{StaticResource Poppins}" Click="SubmitButton_Click" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Margin="5"/>
                 </StackPanel>
 
             </StackPanel>

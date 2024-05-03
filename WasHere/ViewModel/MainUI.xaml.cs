@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using WasHere.Database;
@@ -19,6 +16,7 @@ namespace WasHere.ViewModel
 
         public void OnStart()
         {
+
             if (App.user != null)
             {
                 using (var DbContext = new DatabaseContext())
@@ -32,7 +30,6 @@ namespace WasHere.ViewModel
                 MessageBox.Show("NULL");
             }
         }
-
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -65,11 +62,11 @@ namespace WasHere.ViewModel
 
         private void Clear_dns_cache_button(object sender, RoutedEventArgs e)
         {
-            string dns = "Utils/dns.cmd";
-            string cache = "Utils/cache.cmd";
-            string logs = "Utils/logs.cmd";
-            string tempfiles = "Utils/tempfiles.cmd";
-            string diskcleanup = "Utils/diskclean.cmd";
+            string dns = "Resources/dns.cmd";
+            string cache = "Resources/cache.cmd";
+            string logs = "Resources/logs.cmd";
+            string tempfiles = "Resources/tempfiles.cmd";
+            string diskcleanup = "Resources/diskclean.cmd";
 
             List<string> missingFiles = new List<string>();
 
