@@ -45,13 +45,13 @@ namespace WasHere.ViewModel
                 string pcName = Environment.MachineName;
 
 
-                ClearOutput();
+                Utils.OutputManager.ClearOutput(OutputTextBlock);
 
 
                 // Check if IP address is null
                 if (string.IsNullOrEmpty(ipAddress))
                 {
-                    SetOutput("Something unexpected went wrong. Please try again later.");
+                    Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Something unexpected went wrong. Please try again later.");
                     EnableSubmitButton();
                     return;
                 }
@@ -61,7 +61,7 @@ namespace WasHere.ViewModel
 
                 if (isVpnUsed || CloudflareChecker.IsCloudflareWarpEnabled())
                 {
-                    SetOutput("Please disable your VPN connection before registering.");
+                    Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Please disable your VPN connection before registering.");
                     EnableSubmitButton();
                     return;
                 }
@@ -70,7 +70,7 @@ namespace WasHere.ViewModel
                 if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(activationKey))
                 {
 
-                    SetOutput("Please enter all required fields.");
+                    Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Please enter all required fields.");
                     EnableSubmitButton();
                     return;
                 }
@@ -78,7 +78,7 @@ namespace WasHere.ViewModel
 
                 if (password.Length < 8)
                 {
-                    SetOutput("Password must be at least 8 characters long.");
+                    Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Password must be at least 8 characters long.");
                     EnableSubmitButton();
                     return;
                 }
@@ -88,7 +88,7 @@ namespace WasHere.ViewModel
                 // Check if password is compromised
                 if (await IsPasswordCompromised(password))
                 {
-                    SetOutput("Password has been compromised. Please choose a different one.");
+                    Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Password has been compromised. Please choose a different one.");
                     EnableSubmitButton();
                     return;
                 }
@@ -107,7 +107,7 @@ namespace WasHere.ViewModel
 
                 if (!KeyAuthApp.response.success)
                 {
-                    SetOutput("Invalid activation key. Please check and try again.");
+                    Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Invalid activation key. Please check and try again.");
                     KeyTextBox.Clear();
                     EnableSubmitButton();
                     return;
@@ -134,12 +134,12 @@ namespace WasHere.ViewModel
 
                         if (existingUser != null)
                         {
-                            SetOutput("User already exists!");
+                        Utils.OutputManager.SetOutputAsync(OutputTextBlock, "User already exists!");
                             EnableSubmitButton();       
                             return;
                         }
 
-                        SetOutput($"Registration successful!\n\nUsername: {newUser.UserName}\nPassword: {PasswordBox.Password}");
+                        Utils.OutputManager.SetOutputAsync(OutputTextBlock, $"Registration successful!\n\nUsername: {newUser.UserName}\nPassword: {PasswordBox.Password}");
                         await dbContext.AddUserAsync(newUser);
                         UsernameTextBox.Clear();
                         PasswordBox.Clear();
@@ -150,7 +150,7 @@ namespace WasHere.ViewModel
             catch (Exception ex)
             {
                 LogError(ex);
-                SetOutput("An error occurred. Please try again later.");
+                Utils.OutputManager.SetOutputAsync(OutputTextBlock, "An error occurred. Please try again later.");
                 EnableSubmitButton();
                 return;
             }
@@ -199,38 +199,6 @@ namespace WasHere.ViewModel
             await Task.Delay(1000); // Adjust the delay time as needed
             SumbitButton.IsEnabled = true;
         }
-
-
-        private void ClearOutput()
-        {
-            OutputTextBlock.Text = "";
-            currentIndex = 0;
-            outputText = "";
-        }
-
-        private async void SetOutput(string text)
-        {
-            ClearOutput();
-            outputText = text;
-            await TypeTextAsync();
-        }
-
-        private async void AppendOutput(string text)
-        {
-            outputText = text;
-            await TypeTextAsync();
-        }
-
-        private async Task TypeTextAsync()
-        {
-            while (currentIndex < outputText.Length)
-            {
-                OutputTextBlock.Text += outputText[currentIndex];
-                currentIndex++;
-                await Task.Delay(50); // Adjust typing speed here
-            }
-        }
-
 
 
         private void LogError(Exception ex)

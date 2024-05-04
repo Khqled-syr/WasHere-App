@@ -8,7 +8,7 @@
         MouseLeftButtonUp="Window_MouseLeftButtonUp" 
         Height="450" Width="800"
         Title="WasHere"
-        Icon="/Resources/Icon.png"
+        Icon="/Resources/icon.ico"
         WindowStyle="None" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
@@ -29,8 +29,7 @@
     <Window.Style>
         <StaticResource ResourceKey="RoundedWindowStyle"/>
     </Window.Style>
-    
-    
+
 
     <Grid>
         <!-- Title -->
@@ -41,11 +40,25 @@
 
 
         <!--User Title-->
+        <!--<Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="15" Margin="10,10,575,394" Padding="10">
+            <TextBlock x:Name="UserTitle" Text="Logged in as: ...." FontFamily="{StaticResource PoppinsSemiBold}" FontSize="15" FontStyle="Oblique" Foreground="LightGray" Opacity="1" Margin="0,0,65,0"/>
+        </Border>-->
+        <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="15" Margin="10,10,575,394" Padding="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="UserTitle" Text="Logged in as: .... " HorizontalAlignment="Left" FontFamily="{StaticResource PoppinsSemiBold}" FontSize="15" FontStyle="Oblique" Foreground="LightGray" Opacity="1" Margin="-2,0,0,0" Width="138" Grid.ColumnSpan="2"/>
+                <Button Click="AccountButton" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Icon:PackIconMaterial Kind="AccountEdit" Background="LightGray"/>
+                </Button>
+            </Grid>
+        </Border>
 
-        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
-            <TextBlock x:Name="UserTitle" FontFamily="{StaticResource PoppinsLight}" FontSize="12" FontStyle="Italic" Foreground="LightGray" Height="70" Width="130"/>
 
-        </StackPanel>
+
+
 
         <!-- Close Button -->
         <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,10,0">
@@ -55,32 +68,51 @@
         </StackPanel>
 
 
-        <!-- Settings Button -->
-        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20">
-            <Button FontFamily="{StaticResource PoppinsExtraBold}" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Click="SettingsButton_Click">
-                <StackPanel Orientation="Horizontal">
-                    <Icon:PackIconMaterial Kind="AccountSettings" VerticalAlignment="Center" Foreground="White"/>
-                    <TextBlock Text="Settings" Margin="5,0,0,0" VerticalAlignment="Center" Foreground="White"/>
-                </StackPanel>
-            </Button>
-        </StackPanel>
+
+        <!-- Output Title -->
+        <TextBlock Text="Output" FontSize="24" HorizontalAlignment="Right" VerticalAlignment="Top" FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White" Margin="0,117,88,0"/>
+
+        <!-- Output Border -->
+        <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Center" Margin="550,154,12,146" Padding="10" CornerRadius="20">
+            <TextBlock x:Name="OutputTextBlock" VerticalAlignment="Center" TextWrapping="Wrap" FontFamily="{StaticResource Poppins}" FontSize="16" Foreground="White" RenderTransformOrigin="0.5,0.5" Height="120">
+                <TextBlock.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="1"/>
+                        <SkewTransform AngleY="-0.17"/>
+                        <RotateTransform Angle="360.084"/>
+                        <TranslateTransform X="-0.001" Y="-0.351"/>
+                    </TransformGroup>
+                </TextBlock.RenderTransform>
+            </TextBlock>
+        </Border>
+
+
+        <!-- Separator line -->
+        <Separator VerticalAlignment="Top" Height="2" Background="White" Margin="-3,75,2,0"/>
 
         <!-- Main content -->
-        <Grid VerticalAlignment="Center">
+        <Grid VerticalAlignment="Top" Margin="4,323,454,0" Height="114">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- Separator line -->
-            <Separator VerticalAlignment="Top" Height="2" Background="White" Margin="0,10,0,0"/>
 
             <!-- Buttons -->
-            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,50,0,0">
-                <Button Content="Optimise" FontFamily="{StaticResource PoppinsExtraBold}" Click="Clear_dns_cache_button" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Margin="5"/>
+            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,50,10,0">
+                <Button Content="OPTIMIZE" FontFamily="{StaticResource PoppinsExtraBold}" Click="SystemCommands_Button" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Margin="5"/>
                 <Button Content="Boost FPS" FontFamily="{StaticResource PoppinsExtraBold}" Click="Boostfps_Button" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Margin="5"/>
                 <Button Content="Button 3" FontFamily="{StaticResource PoppinsExtraBold}" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Margin="5"/>
             </StackPanel>
+
+            <!-- Settings Button -->
         </Grid>
+
+        <Button Grid.Row="0" FontFamily="{StaticResource PoppinsExtraBold}" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Click="SettingsButton_Click" HorizontalAlignment="Right" Margin="0,376,15,24">
+            <StackPanel Orientation="Horizontal">
+                <Icon:PackIconMaterial Kind="AccountSettings" VerticalAlignment="Center" Foreground="White"/>
+                <TextBlock Text="Settings" Margin="5,0,0,0" VerticalAlignment="Center" Foreground="White"/>
+            </StackPanel>
+        </Button>
     </Grid>
 </Window>

@@ -20,6 +20,8 @@
             </Button>
         </StackPanel>
 
+        <!-- Separator line -->
+        <Separator VerticalAlignment="Top" Height="2" Background="White" Margin="-3,75,2,0"/>
 
         <!-- Output Title -->
         <TextBlock Text="Output" FontSize="24" HorizontalAlignment="Right" VerticalAlignment="Top" FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White" Margin="0,117,88,0"/>
@@ -38,9 +40,6 @@
             </TextBlock>
         </Border>
 
-
-        <!-- Separator line -->
-        <Separator VerticalAlignment="Top" Height="2" Background="White" Margin="0,76,0,0"/>
 
         <!-- Main content -->
         <Grid VerticalAlignment="Center">

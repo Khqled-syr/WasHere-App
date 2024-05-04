@@ -25,12 +25,12 @@ namespace WasHere.ViewModel
             LoginButton.IsEnabled = false;
 
 
-            ClearOutput();
+            Utils.OutputManager.ClearOutput(OutputTextBlock);
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
 
-                SetOutput("Please enter all required fields.");
+                Utils.OutputManager.SetOutputAsync(OutputTextBlock,"Please enter all required fields.");
                 LoginButton.IsEnabled = true;
                 return;
 
@@ -47,7 +47,7 @@ namespace WasHere.ViewModel
                     {
                         // Authentication successful 
                         await Task.Delay(20);
-                        SetOutput("Succesfully logged in!");
+                        Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Succesfully logged in!");
                         App.user = user;
                         await Task.Delay(2500);
 
@@ -57,7 +57,7 @@ namespace WasHere.ViewModel
                     }
                     else
                     {
-                        SetOutput("Password or Username is not correct, please try again.");
+                        Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Password or Username is not correct, please try again.");
                         LoginButton.IsEnabled = true;
                         PasswordBox.Clear();
                         return;
@@ -68,7 +68,7 @@ namespace WasHere.ViewModel
                 else
                 {
                     // Incorrect password
-                    SetOutput("Password or Username is not correct, please try again.");
+                    Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Password or Username is not correct, please try again.");
                     LoginButton.IsEnabled = true;
                     PasswordBox.Clear();
                     return;
@@ -77,35 +77,35 @@ namespace WasHere.ViewModel
             LoginButton.IsEnabled = true;
         }
 
-        private void ClearOutput()
-        {
-            OutputTextBlock.Text = "";
-            currentIndex = 0;
-            outputText = "";
-        }
+        //private void ClearOutput()
+        //{
+        //    OutputTextBlock.Text = "";
+        //    currentIndex = 0;
+        //    outputText = "";
+        //}
 
-        private async void SetOutput(string text)
-        {
-            ClearOutput();
-            outputText = text;
-            await TypeTextAsync();
-        }
+        //private async void SetOutput(string text)
+        //{
+        //    ClearOutput();
+        //    outputText = text;
+        //    await TypeTextAsync();
+        //}
 
-        private async void AppendOutput(string text)
-        {
-            outputText = text;
-            await TypeTextAsync();
-        }
+        //private async void AppendOutput(string text)
+        //{
+        //    outputText = text;
+        //    await TypeTextAsync();
+        //}
 
-        private async Task TypeTextAsync()
-        {
-            while (currentIndex < outputText.Length)
-            {
-                OutputTextBlock.Text += outputText[currentIndex];
-                currentIndex++;
-                await Task.Delay(50); // Adjust typing speed here
-            }
-        }
+        //private async Task TypeTextAsync()
+        //{
+        //    while (currentIndex < outputText.Length)
+        //    {
+        //        OutputTextBlock.Text += outputText[currentIndex];
+        //        currentIndex++;
+        //        await Task.Delay(50); // Adjust typing speed here
+        //    }
+        //}
 
 
         private void RegisterButton_Click(object sender, RoutedEventArgs e)

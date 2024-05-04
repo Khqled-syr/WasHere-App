@@ -21,14 +21,22 @@ namespace WasHere.ViewModel
             {
                 using (var DbContext = new DatabaseContext())
                 {
-                    UserTitle.Text = $"Logged in as: {App.user.UserName}";
+                    UserTitle.Text = $"{App.user.UserName}!";
+                    Utils.OutputManager.SetOutputAsync(OutputTextBlock, $"Welcome {App.user.UserName}");
                 }
-
             }
             else
             {
                 MessageBox.Show("NULL");
             }
+        }
+
+
+        private async void AccountButton(object sender, RoutedEventArgs e)
+        {
+            Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Loading Account settings...");
+            await Task.Delay(2500);
+            this.Content = new SettingsPage();
         }
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -55,55 +63,24 @@ namespace WasHere.ViewModel
             Environment.Exit(0);
         }
 
-        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        private async void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
+            Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Loading settings...");
+            await Task.Delay(2500);
             this.Content = new SettingsPage();
         }
 
-        private void Clear_dns_cache_button(object sender, RoutedEventArgs e)
+
+        private async void SystemCommands_Button(object sender, RoutedEventArgs e)
         {
-            string dns = "Resources/dns.cmd";
-            string cache = "Resources/cache.cmd";
-            string logs = "Resources/logs.cmd";
-            string tempfiles = "Resources/tempfiles.cmd";
-            string diskcleanup = "Resources/diskclean.cmd";
-
-            List<string> missingFiles = new List<string>();
-
-            if (!System.IO.File.Exists(dns))
-                missingFiles.Add("dns.cmd");
-
-            if (!System.IO.File.Exists(cache))
-                missingFiles.Add("cache.cmd");
-
-            if (!System.IO.File.Exists(logs))
-                missingFiles.Add("logs.cmd");
-
-            if (!System.IO.File.Exists(tempfiles))
-                missingFiles.Add("tempfiles.cmd");
-
-            if (!System.IO.File.Exists(diskcleanup))
-                missingFiles.Add("diskclean.cmd");
-
-            if (missingFiles.Count > 0)
+            try
             {
-                string errorMessage = "The following files are missing:\n" + string.Join("\n", missingFiles);
-                MessageBox.Show(errorMessage);
+                await Utils.SystemCommands.ClearSystemCache();
+                Utils.OutputManager.SetOutputAsync(OutputTextBlock, "All processes are done!");
             }
-            else
+            catch (Exception ex)
             {
-                Task.Run(async () =>
-                {
-                    await Task.WhenAll(
-                        Process.Start(dns).WaitForExitAsync(),
-                        Process.Start(cache).WaitForExitAsync(),
-                        Process.Start(logs).WaitForExitAsync(),
-                        Process.Start(tempfiles).WaitForExitAsync(),
-                        Process.Start(diskcleanup).WaitForExitAsync()
-                        );
-
-                    MessageBox.Show("All processes are done!");
-                });
+                Utils.OutputManager.SetOutputAsync(OutputTextBlock, $"An error occurred: {ex.Message}");
             }
         }
 
@@ -115,7 +92,7 @@ namespace WasHere.ViewModel
 
         private void BoostFps()
         {
-            MessageBox.Show("Performance boosting actions completed.", "Performance Boost", MessageBoxButton.OK, MessageBoxImage.Information);
+            Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Performance boosting actions completed.");
         }
     }
 }
