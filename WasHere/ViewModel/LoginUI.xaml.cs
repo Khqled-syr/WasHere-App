@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using WasHere.Database;
+using BC = BCrypt.Net.BCrypt;
 
 namespace WasHere.ViewModel
 {
@@ -40,29 +41,41 @@ namespace WasHere.ViewModel
             {
                 Database.User? user = dbContext.Users.FirstOrDefault(user => user.UserName.ToLower() == username.ToLower());
 
-                if (user != null && user.Password == password)
+                if (user != null)
                 {
-                    // Authentication successful 
-                    await Task.Delay(20);
-                    SetOutput("Succesfully logged in!");
-                    App.user = user;
-                    await Task.Delay(2300);
+                    if(BC.Verify(PasswordBox.Password, user.Password))
+                    {
+                        // Authentication successful 
+                        await Task.Delay(20);
+                        SetOutput("Succesfully logged in!");
+                        App.user = user;
+                        await Task.Delay(2500);
 
-                    MainUI mainUI = new MainUI();
-                    mainUI.Show();
-                    //ApplyAnimation(mainUI);
-                    this.Close();
+                        MainUI mainUI = new MainUI();
+                        mainUI.Show();
+                        this.Close();
+                    }
+                    else
+                    {
+                        SetOutput("Password or Username is not correct, please try again.");
+                        LoginButton.IsEnabled = true;
+                        PasswordBox.Clear();
+                        return;
+
+                    }
+                    LoginButton.IsEnabled = true;
                 }
                 else
                 {
                     // Incorrect password
                     SetOutput("Password or Username is not correct, please try again.");
+                    LoginButton.IsEnabled = true;
                     PasswordBox.Clear();
+                    return;
                 }
             }
             LoginButton.IsEnabled = true;
         }
-
 
         private void ClearOutput()
         {

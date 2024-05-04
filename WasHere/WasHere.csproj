@@ -8,6 +8,7 @@
     <UseWPF>true</UseWPF>
     <StartupObject>WasHere.App</StartupObject>
     <RootNamespace>WasHere</RootNamespace>
+    <AssemblyName>WasHere</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,6 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
     <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="4.11.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />

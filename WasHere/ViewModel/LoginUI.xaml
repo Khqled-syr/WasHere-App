@@ -2,7 +2,6 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:Icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:gif="http://wpfanimatedgif.codeplex.com"
         AllowsTransparency="True" Background="#CC000000"
         Height="450" Width="800"
         Title="WasHere"

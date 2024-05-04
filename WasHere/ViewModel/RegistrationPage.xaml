@@ -1,8 +1,10 @@
 ﻿<Page x:Class="WasHere.ViewModel.RegistrationPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:Icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+      xmlns:av="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="av"
       Title="Registration Page" Height="450" Width="800">
 
     <Grid>

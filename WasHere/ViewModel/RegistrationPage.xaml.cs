@@ -1,11 +1,12 @@
 ﻿using System.IO;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using WasHere.Database;
 using WasHere.Utils;
-using System.Security.Cryptography;
+using BC = BCrypt.Net.BCrypt;
 
 
 namespace WasHere.ViewModel
@@ -20,7 +21,6 @@ namespace WasHere.ViewModel
             version: "1.0" // Application Version, /*
 );
 
-
         private int currentIndex;
         private string? outputText;
 
@@ -28,8 +28,6 @@ namespace WasHere.ViewModel
         public RegistrationPage()
         {
             InitializeComponent();
-            GenerateEncryptionKey();
-
         }
 
         private async void SubmitButton_Click(object sender, RoutedEventArgs e)
@@ -96,9 +94,6 @@ namespace WasHere.ViewModel
                 }
 
 
-                string encryptedPassword = EncryptPassword(password);
-
-
 
                 await Task.Run(() =>
                 {
@@ -117,27 +112,34 @@ namespace WasHere.ViewModel
                     EnableSubmitButton();
                     return;
                 }
-                    User newUser = new User
-                    {
-                        UserName = username,
-                        Password = password,
-                        ActivationKey = activationKey,
-                        IpAddress = ipAddress,
-                        PcName = pcName
-                    };
 
-                    using (var dbContext = new DatabaseContext())
+
+                var hashed = BC.HashPassword(PasswordBox.Password);
+                var hashedKey = BC.HashString(KeyTextBox.Text);
+
+                User newUser = new User
+                {
+                    UserName = username,
+                    Password = hashed,
+                    ActivationKey = hashedKey,
+                    IpAddress = ipAddress,
+                    PcName = pcName
+
+                };
+
+
+                using (var dbContext = new DatabaseContext())
                     {
                         var existingUser = dbContext.Users.FirstOrDefault(u => u.UserName == username);
 
                         if (existingUser != null)
                         {
                             SetOutput("User already exists!");
-                        EnableSubmitButton();
+                            EnableSubmitButton();       
                             return;
                         }
 
-                        SetOutput($"Registration successful!\n\nUser: {newUser.UserName}\nPassword: {newUser.Password}");
+                        SetOutput($"Registration successful!\n\nUsername: {newUser.UserName}\nPassword: {PasswordBox.Password}");
                         await dbContext.AddUserAsync(newUser);
                         UsernameTextBox.Clear();
                         PasswordBox.Clear();
@@ -153,61 +155,6 @@ namespace WasHere.ViewModel
                 return;
             }
         }
-
-        private string EncryptPassword(string password)
-        {
-            // AES encryption key (32 bytes for AES256)
-            byte[] key = Encoding.UTF8.GetBytes("YOUR_ENCRYPTION_KEY_HERE");
-            // AES initialization vector (16 bytes for AES256)
-            byte[] iv = Encoding.UTF8.GetBytes("YOUR_INITIALIZATION_VECTOR_HERE");
-
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = key;
-                aesAlg.IV = iv;
-
-                // Create an encryptor to perform the stream transform.
-                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-
-                // Create the streams used for encryption.
-                using (MemoryStream msEncrypt = new MemoryStream())
-                {
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-                        {
-                            // Write all data to the stream.
-                            swEncrypt.Write(password);
-                        }
-                        return Convert.ToBase64String(msEncrypt.ToArray());
-                    }
-                }
-            }
-        }
-
-        private static void GenerateEncryptionKey()
-        {
-            byte[] key = new byte[32]; // 32 bytes = 256 bits
-            using (var rng = new RNGCryptoServiceProvider())
-            {
-                rng.GetBytes(key);
-            }
-
-            // Generate a random IV (16 bytes for AES)
-            byte[] iv = new byte[16];
-            using (var rng = new RNGCryptoServiceProvider())
-            {
-                rng.GetBytes(iv);
-            }
-
-            // Convert the key and IV to Base64-encoded strings for storage or transmission
-            string base64Key = Convert.ToBase64String(key);
-            string base64IV = Convert.ToBase64String(iv);
-
-            Console.WriteLine("Encryption Key: " + base64Key);
-            Console.WriteLine("Initialization Vector (IV): " + base64IV);
-        }
-
 
         private async Task<bool> IsPasswordCompromised(string password)
         {
