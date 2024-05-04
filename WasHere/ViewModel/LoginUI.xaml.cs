@@ -1,6 +1,9 @@
-﻿using System.Windows;
+﻿using System.Net;
+using System.Net.Http;
+using System.Windows;
 using System.Windows.Controls;
 using WasHere.Database;
+using Windows.Media.Protection.PlayReady;
 using BC = BCrypt.Net.BCrypt;
 
 namespace WasHere.ViewModel
@@ -24,7 +27,6 @@ namespace WasHere.ViewModel
 
             LoginButton.IsEnabled = false;
 
-
             Utils.OutputManager.ClearOutput(OutputTextBlock);
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
@@ -33,7 +35,18 @@ namespace WasHere.ViewModel
                 Utils.OutputManager.SetOutputAsync(OutputTextBlock,"Please enter all required fields.");
                 LoginButton.IsEnabled = true;
                 return;
+            }
 
+            string userIP;
+            try
+            {
+                userIP = GetPublicIpAddress();
+            }
+            catch (Exception ex)
+            {
+                Utils.OutputManager.SetOutputAsync(OutputTextBlock, $"Unable to connect to the server, make sure you're connected to the internet!");
+                LoginButton.IsEnabled = true;
+                return;
             }
 
 
@@ -43,8 +56,15 @@ namespace WasHere.ViewModel
 
                 if (user != null)
                 {
-                    if(BC.Verify(PasswordBox.Password, user.Password))
+                    if (BC.Verify(PasswordBox.Password, user.Password))
                     {
+                        if (userIP != user.IpAddress)
+                        {
+                            Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Please disable your vpn before logging in!");
+                            LoginButton.IsEnabled = true;
+                            return;
+                        }
+
                         // Authentication successful 
                         await Task.Delay(20);
                         Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Succesfully logged in!");
@@ -77,35 +97,13 @@ namespace WasHere.ViewModel
             LoginButton.IsEnabled = true;
         }
 
-        //private void ClearOutput()
-        //{
-        //    OutputTextBlock.Text = "";
-        //    currentIndex = 0;
-        //    outputText = "";
-        //}
-
-        //private async void SetOutput(string text)
-        //{
-        //    ClearOutput();
-        //    outputText = text;
-        //    await TypeTextAsync();
-        //}
-
-        //private async void AppendOutput(string text)
-        //{
-        //    outputText = text;
-        //    await TypeTextAsync();
-        //}
-
-        //private async Task TypeTextAsync()
-        //{
-        //    while (currentIndex < outputText.Length)
-        //    {
-        //        OutputTextBlock.Text += outputText[currentIndex];
-        //        currentIndex++;
-        //        await Task.Delay(50); // Adjust typing speed here
-        //    }
-        //}
+        private string GetPublicIpAddress()
+        {
+            using (var client = new WebClient())
+            {
+                return client.DownloadString("https://api64.ipify.org");
+            }
+        }
 
 
         private void RegisterButton_Click(object sender, RoutedEventArgs e)
