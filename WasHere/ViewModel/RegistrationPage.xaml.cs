@@ -51,7 +51,7 @@ namespace WasHere.ViewModel
                 // Check if IP address is null
                 if (string.IsNullOrEmpty(ipAddress))
                 {
-                    Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Something unexpected went wrong. Please try again later.");
+                    _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Something unexpected went wrong. Please try again later.");
                     EnableSubmitButton();
                     return;
                 }
@@ -61,7 +61,7 @@ namespace WasHere.ViewModel
 
                 if (isVpnUsed || CloudflareChecker.IsCloudflareWarpEnabled())
                 {
-                    Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Please disable your VPN connection before registering.");
+                    _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Please disable your VPN connection before registering.");
                     EnableSubmitButton();
                     return;
                 }
@@ -70,7 +70,7 @@ namespace WasHere.ViewModel
                 if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(activationKey))
                 {
 
-                    Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Please enter all required fields.");
+                    _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Please enter all required fields.");
                     EnableSubmitButton();
                     return;
                 }
@@ -78,7 +78,7 @@ namespace WasHere.ViewModel
 
                 if (password.Length < 8)
                 {
-                    Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Password must be at least 8 characters long.");
+                    _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Password must be at least 8 characters long.");
                     EnableSubmitButton();
                     return;
                 }
@@ -88,7 +88,7 @@ namespace WasHere.ViewModel
                 // Check if password is compromised
                 if (await IsPasswordCompromised(password))
                 {
-                    Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Password has been compromised. Please choose a different one.");
+                    _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Password has been compromised. Please choose a different one.");
                     EnableSubmitButton();
                     return;
                 }
@@ -107,7 +107,7 @@ namespace WasHere.ViewModel
 
                 if (!KeyAuthApp.response.success)
                 {
-                    Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Invalid activation key. Please check and try again.");
+                    _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Invalid activation key. Please check and try again.");
                     KeyTextBox.Clear();
                     EnableSubmitButton();
                     return;
@@ -115,13 +115,12 @@ namespace WasHere.ViewModel
 
 
                 var hashed = BC.HashPassword(PasswordBox.Password);
-                var hashedKey = BC.HashString(KeyTextBox.Text);
 
                 User newUser = new User
                 {
                     UserName = username,
                     Password = hashed,
-                    ActivationKey = hashedKey,
+                    ActivationKey = activationKey,
                     IpAddress = ipAddress,
                     PcName = pcName
 
@@ -134,23 +133,28 @@ namespace WasHere.ViewModel
 
                         if (existingUser != null)
                         {
-                        Utils.OutputManager.SetOutputAsync(OutputTextBlock, "User already exists!");
+                        _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "User already exists!");
                             EnableSubmitButton();       
                             return;
                         }
 
-                        Utils.OutputManager.SetOutputAsync(OutputTextBlock, $"Registration successful!\n\nUsername: {newUser.UserName}\nPassword: {PasswordBox.Password}");
+                        _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, $"Registration successful!\n\nUsername: {newUser.UserName}\nPassword: {PasswordBox.Password}");
                         await dbContext.AddUserAsync(newUser);
                         UsernameTextBox.Clear();
                         PasswordBox.Clear();
                         KeyTextBox.Clear();
                         SumbitButton.IsEnabled = false;
-                    }
+                    await Task.Delay(3500);
+                    LoginUI loginUI = new LoginUI();
+                    loginUI.Visibility = Visibility.Visible;
+                    await Task.Delay(10);
+                    ((Window)Parent).Close();
+                }
             }
             catch (Exception ex)
             {
                 LogError(ex);
-                Utils.OutputManager.SetOutputAsync(OutputTextBlock, "An error occurred. Please try again later.");
+                _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "An error occurred. Please try again later.");
                 EnableSubmitButton();
                 return;
             }

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace WasHere.Utils
 {

@@ -49,8 +49,8 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock x:Name="UserTitle" Text="Logged in as: .... " HorizontalAlignment="Left" FontFamily="{StaticResource PoppinsSemiBold}" FontSize="15" FontStyle="Oblique" Foreground="LightGray" Opacity="1" Margin="-2,0,0,0" Width="138" Grid.ColumnSpan="2"/>
-                <Button Click="AccountButton" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <TextBlock x:Name="UserTitle" Text="Logged in as: .... " TextDecorations="Underline" HorizontalAlignment="Left" FontFamily="{StaticResource PoppinsSemiBold}" FontSize="15" FontStyle="Oblique" Foreground="LightGray" Opacity="1" Margin="-2,0,0,0" Width="138" Grid.ColumnSpan="2"/>
+                <Button x:Name="AccountSettingsButton" Click="AccountButton" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <Icon:PackIconMaterial Kind="AccountEdit" Background="LightGray"/>
                 </Button>
             </Grid>

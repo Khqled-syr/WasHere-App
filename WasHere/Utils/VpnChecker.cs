@@ -1,29 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WasHere.Utils
 {
     public static class VpnChecker
     {
-
-        private static string[] KnownVPNIPs =
-    {
-        "1.2.3.4", // Add more known VPN IP addresses here
-        "5.6.7.8"
-    };
-
+        private static HashSet<string> KnownVPNIPs = new HashSet<string>
+        {
+            "1.2.3.4", // Add more known VPN IP addresses here
+            "5.6.7.8"
+        };
 
         public static async Task<bool> IsVpnUsed(string ipAddress)
         {
-
-            if (IsLocalIpAddress(ipAddress)) {
+            if (IsLocalIpAddress(ipAddress))
+            {
                 return false;
             }
 
-            if(KnownVPNIPs.Contains(ipAddress))
+            if (KnownVPNIPs.Contains(ipAddress))
             {
                 return true;
             }
@@ -32,7 +27,6 @@ namespace WasHere.Utils
             {
                 return true;
             }
-
 
             return false;
         }
@@ -44,15 +38,14 @@ namespace WasHere.Utils
 
         private static bool IsVpnIpAddress(string ipAddress)
         {
-            // Check if the IP address belongs to a VPN range
-            // You can add your own logic here based on known VPN IP address ranges
+            // Add logic to detect VPN IP addresses based on known VPN ranges or patterns
             // Example:
             // if (ipAddress.StartsWith("172.16.") || ipAddress.StartsWith("172.17.") || ipAddress.StartsWith("172.18.") || ipAddress.StartsWith("172.19."))
             // {
             //     return true;
             // }
+
             return false;
         }
-
     }
 }
