@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 using WasHere.Database;
 
@@ -10,10 +9,9 @@ namespace WasHere.ViewModel
         public MainUI()
         {
             InitializeComponent();
-            OnStart();
+            OnLoaderStartUp();
         }
-
-        public void OnStart()
+        private void OnLoaderStartUp()
         {
             if (App.user != null)
             {
@@ -28,46 +26,9 @@ namespace WasHere.ViewModel
             }
             else
             {
-                MessageBox.Show("NULL");
+                MessageBox.Show("Error");
             }
         }
-
-        private async void AccountButton(object sender, RoutedEventArgs e)
-        {
-            AccountSettingsButton.IsEnabled = true;
-
-            _ = Utils.OutputManager.SetOutputAsync(
-                OutputTextBlock,
-                "Loading Account settings..."
-                );
-            AccountSettingsButton.IsEnabled = false;
-            await Task.Delay(2500);
-            this.Content = new SettingsPage();
-        }
-
-        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            DragMove();
-        }
-
-        private void Window_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                DragMove();
-            }
-        }
-
-        private void Window_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            // Stop dragging the window
-        }
-
-        private void CloseAppBtn_Click(object sender, RoutedEventArgs e)
-        {
-            Environment.Exit(0);
-        }
-
         private async void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             _ = Utils.OutputManager.SetOutputAsync(
@@ -75,9 +36,8 @@ namespace WasHere.ViewModel
                 "Loading settings..."
                 );
             await Task.Delay(2500);
-            this.Content = new SettingsPage();
+            this.Content = new InformationsPage();
         }
-
         private async void SystemCommands_Button(object sender, RoutedEventArgs e)
         {
             try
@@ -99,15 +59,42 @@ namespace WasHere.ViewModel
 
         private void Boostfps_Button(object sender, EventArgs e)
         {
-            BoostFps();
+
         }
 
-        private void BoostFps()
+        private async void AccountButton(object sender, RoutedEventArgs e)
         {
+            AccountSettingsButton.IsEnabled = true;
+
             _ = Utils.OutputManager.SetOutputAsync(
                 OutputTextBlock,
-                "Performance boosting actions completed."
+                "Loading Account settings..."
             );
+            AccountSettingsButton.IsEnabled = false;
+            await Task.Delay(2500);
+            this.Content = new InformationsPage();
+        }
+
+        private void CloseAppBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Environment.Exit(0);
+        }
+
+        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
+        private void Window_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                DragMove();
+            }
+        }
+
+        private void Window_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            // Stop dragging the window
         }
     }
 }

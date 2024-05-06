@@ -32,9 +32,11 @@
     <Grid>
 
         <!-- Title -->
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,40,10,0">
-            <Icon:PackIconMaterial Kind="Tools" Foreground="White" Margin="225,10,0,-30" Height="19" Width="25"/>
-            <TextBlock Text="WasHere Tweaker" FontSize="24"  FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White"/>
+        <!-- Title -->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,40,0,0">
+            <TextBlock Text="WasHere Login" FontSize="24" FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White"/>
+            <!-- Separator line -->
+            <Separator VerticalAlignment="Top" Height="2" Background="White" Margin="0,10,0,0"/>
         </StackPanel>
 
         <!-- Minimize Button -->
@@ -51,8 +53,6 @@
             </Button>
         </StackPanel>
 
-        <!-- Separator line -->
-        <Separator VerticalAlignment="Top" Height="2" Background="White" Margin="-3,75,2,0"/>
 
         <!-- Output Title -->
         <TextBlock Text="Output" FontSize="24" HorizontalAlignment="Right" VerticalAlignment="Top" FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White" Margin="0,117,88,0"/>

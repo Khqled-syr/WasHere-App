@@ -1,36 +1,22 @@
-﻿using Newtonsoft.Json.Converters;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Input;
 using WasHere.Database;
+using WasHere.Utils;
 using BC = BCrypt.Net.BCrypt;
 
 namespace WasHere.ViewModel
 {
     public partial class LoginUI : Window
     {
-        int currentIndex;
-        string? outputText;
-
-
-        public static Api KeyAuthApp = new Api(
-            name: "WasHere", // Application Name
-            ownerid: "lYgBCNDiV1", // Owner ID
-            secret: "f3a1cd3b7a23189aa43c700cba35f5413c8d30d84b2ed327d86d1a0e60ed6e87", // Application Secret
-            version: "1.0" // Application Version, /*
-);
-
-
         public LoginUI()
         {
             InitializeComponent();
-
-             KeyAuthApp.init();
+            CheckVpnOnStartUp();
+            KeyAuthApi.KeyAuthApp.init();
 
         }
-
-    async void LoginButton_Click(object sender, RoutedEventArgs e)
+        private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             var username = UserTextBox.Text;
             var password = PasswordBox.Password;
@@ -50,7 +36,6 @@ namespace WasHere.ViewModel
             }
 
             string userIP;
-            
 
             try
             {
@@ -58,10 +43,10 @@ namespace WasHere.ViewModel
             }
             catch (Exception ex)
             {
-               _ = Utils.OutputManager.SetOutputAsync(
-                    OutputTextBlock,
-                    $"Unable to connect to the server, make sure you're connected to the internet!"
-                );
+                _ = Utils.OutputManager.SetOutputAsync(
+                     OutputTextBlock,
+                     $"Unable to connect to the server, make sure you're connected to the internet!"
+                 );
                 LoginButton.IsEnabled = true;
                 return;
             }
@@ -76,8 +61,7 @@ namespace WasHere.ViewModel
                 {
                     if (BC.Verify(PasswordBox.Password, user.Password))
                     {
-
-                        if (KeyAuthApp.checkblack())
+                        if (Utils.KeyAuthApi.KeyAuthApp.checkblack())
                         {
                             await Task.Delay(20);
                             _ = Utils.OutputManager.SetOutputAsync(
@@ -88,9 +72,9 @@ namespace WasHere.ViewModel
 
                         string key = user.ActivationKey;
 
-                        KeyAuthApp.license(key.ToString());
+                        Utils.KeyAuthApi.KeyAuthApp.license(key.ToString());
 
-                        if (KeyAuthApp.response.success == true)
+                        if (Utils.KeyAuthApi.KeyAuthApp.response.success == true)
                         {
                             // Authentication successful
                             await Task.Delay(20);
@@ -106,7 +90,7 @@ namespace WasHere.ViewModel
                             mainUI.Show();
                             Close();
                         }
-                        else if(KeyAuthApp.response.success == false)
+                        else if (Utils.KeyAuthApi.KeyAuthApp.response.success == false)
                         {
                             // Authentication not successful
                             await Task.Delay(20);
@@ -146,23 +130,24 @@ namespace WasHere.ViewModel
             LoginButton.IsEnabled = true;
         }
 
-
-        private DateTime UnixTimeToDateTime(long unixtime)
+        private async void CheckVpnOnStartUp()
         {
-            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Local);
+            while (true)
+            {
+                string ipAddress = await GetPublicIpAddressAsync();
 
-            try
-            {
-                dtDateTime = dtDateTime.AddSeconds(unixtime).ToLocalTime();
+                bool isVpnUsed = await VpnChecker.IsVpnUsed(ipAddress);
+
+                if (isVpnUsed || CloudflareChecker.IsCloudflareWarpEnabled())
+                {
+                    string errorMessage = "Please disable your VPN or Cloudflare Warp before logging in.";
+                    _ = MessageBox.Show(errorMessage, "VPN or Cloudflare Warp Detected", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Close();
+                    return;
+                }
+                await Task.Delay(TimeSpan.FromSeconds(1));
             }
-            catch
-            {
-                dtDateTime = DateTime.MaxValue;
-            }
-            return dtDateTime;
         }
-
-
         private async Task<string> GetPublicIpAddressAsync()
         {
             using (var client = new HttpClient())
@@ -179,20 +164,32 @@ namespace WasHere.ViewModel
                 }
             }
         }
-
-
-
-        void RegisterButton_Click(object sender, RoutedEventArgs e)
+        private void RegisterButton_Click(object sender, RoutedEventArgs e)
         {
             Content = new RegistrationPage();
         }
 
-        void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
             // Minimize the window
             WindowState = WindowState.Minimized;
         }
+        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
+        private void Window_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                DragMove();
+            }
+        }
 
-        void CloseAppBtn_Click(object sender, RoutedEventArgs e) => Close();
+        private void Window_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            // Stop dragging the window
+        }
+        private void CloseAppBtn_Click(object sender, RoutedEventArgs e) => Close();
     }
 }

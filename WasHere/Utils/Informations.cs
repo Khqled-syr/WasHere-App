@@ -4,21 +4,62 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
+using WasHere.Utils;
 
 namespace WasHere.ViewModel
 {
-    public class SystemInfo : INotifyPropertyChanged
+    public class Informations : INotifyPropertyChanged
     {
+        // Old properties
+        private string? userName;
+        private DateTime? lastLogin;
+        private DateTime? createDate;
+        private readonly KeyAuthApi Api = new KeyAuthApi();
+
+        public string? UserName
+        {
+            get => userName;
+            set
+            {
+                userName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public DateTime? LastLogin
+        {
+            get => lastLogin;
+            set
+            {
+                lastLogin = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public DateTime? CreateDate
+        {
+            get => createDate;
+            set
+            {
+                createDate = value;
+                OnPropertyChanged();
+            }
+        }
+
+        // New properties
         private string? windowsVersion;
         private string? publicIpAddress;
         private string? connectionType;
         private Brush? connectionStatusColor;
 
-
         public string? WindowsVersion
         {
             get => windowsVersion;
-            set { windowsVersion = value; OnPropertyChanged(); }
+            set
+            {
+                windowsVersion = value;
+                OnPropertyChanged();
+            }
         }
 
         public string? PublicIpAddress
@@ -34,7 +75,6 @@ namespace WasHere.ViewModel
             }
         }
 
-
         public string? ConnectionType
         {
             get => connectionType;
@@ -47,15 +87,19 @@ namespace WasHere.ViewModel
             set { connectionStatusColor = value; OnPropertyChanged(); }
         }
 
-        public SystemInfo()
+        public Informations()
         {
+            // Old properties initialization
+            UserName = App.user.UserName;
+            lastLogin = Api.UnixTimeToDateTime(long.Parse(KeyAuthApi.KeyAuthApp.user_data.lastlogin)) ;
+            CreateDate = Api.UnixTimeToDateTime(long.Parse(KeyAuthApi.KeyAuthApp.user_data.createdate));
 
+            // New properties initialization
             WindowsVersion = GetWindowsEdition();
             UpdatePublicIpAddress();
             ConnectionType = GetConnectionType();
             UpdateConnectionStatus();
         }
-
 
         public static string? GetWindowsEdition()
         {
@@ -70,7 +114,6 @@ namespace WasHere.ViewModel
             }
             return "Unknown";
         }
-
 
         public void UpdatePublicIpAddress()
         {
@@ -98,7 +141,6 @@ namespace WasHere.ViewModel
         }
 
         private string? GetConnectionType()
-
         {
             NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
 
@@ -116,7 +158,6 @@ namespace WasHere.ViewModel
 
             return "Unknown";
         }
-
 
         private void UpdateConnectionStatus()
         {
