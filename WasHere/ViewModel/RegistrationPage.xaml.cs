@@ -11,43 +11,28 @@ using BC = BCrypt.Net.BCrypt;
 
 namespace WasHere.ViewModel
 {
-
     public partial class RegistrationPage : Page
     {
-        public static Api KeyAuthApp = new Api(
-            name: "WasHere", // Application Name
-            ownerid: "lYgBCNDiV1", // Owner ID
-            secret: "f3a1cd3b7a23189aa43c700cba35f5413c8d30d84b2ed327d86d1a0e60ed6e87", // Application Secret
-            version: "1.0" // Application Version, /*
-);
-
-        private int currentIndex;
-        private string? outputText;
-
-
         public RegistrationPage()
         {
+            // Perform the initialization
             InitializeComponent();
+            Utils.KeyAuthApi.KeyAuthApp.init();
         }
-
         private async void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-
                 SumbitButton.IsEnabled = false;
-
-                // Get user input from the text boxes
+                
                 string username = UsernameTextBox.Text;
                 string password = PasswordBox.Password;
                 string activationKey = KeyTextBox.Text;
                 string ipAddress = await GetPublicIpAddressAsync();
                 string pcName = Environment.MachineName;
 
-
                 Utils.OutputManager.ClearOutput(OutputTextBlock);
-
-
+                
                 // Check if IP address is null
                 if (string.IsNullOrEmpty(ipAddress))
                 {
@@ -60,31 +45,24 @@ namespace WasHere.ViewModel
                 bool isVpnUsed = await VpnChecker.IsVpnUsed(ipAddress);
 
                 if (isVpnUsed || CloudflareChecker.IsCloudflareWarpEnabled())
-                {
+                { 
                     _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Please disable your VPN connection before registering.");
-                    EnableSubmitButton();
+                    EnableSubmitButton(); 
                     return;
                 }
-
-
+                
                 if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(activationKey))
                 {
-
                     _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Please enter all required fields.");
                     EnableSubmitButton();
                     return;
                 }
-
-
                 if (password.Length < 8)
                 {
                     _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Password must be at least 8 characters long.");
                     EnableSubmitButton();
                     return;
                 }
-
-
-
                 // Check if password is compromised
                 if (await IsPasswordCompromised(password))
                 {
@@ -92,30 +70,17 @@ namespace WasHere.ViewModel
                     EnableSubmitButton();
                     return;
                 }
-
-
-
-                await Task.Run(() =>
-                {
-                    // Perform the initialization
-                    KeyAuthApp.init();
-                });
-
-
-
-                KeyAuthApp.license(activationKey);
-
-                if (!KeyAuthApp.response.success)
+                
+                Utils.KeyAuthApi.KeyAuthApp.license(activationKey);
+                if (!Utils.KeyAuthApi.KeyAuthApp.response.success)
                 {
                     _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Invalid activation key. Please check and try again.");
                     KeyTextBox.Clear();
                     EnableSubmitButton();
                     return;
                 }
-
-
+                
                 var hashed = BC.HashPassword(PasswordBox.Password);
-
                 User newUser = new User
                 {
                     UserName = username,
@@ -126,29 +91,28 @@ namespace WasHere.ViewModel
 
                 };
 
-
                 using (var dbContext = new DatabaseContext())
+                {
+                    var existingUser = dbContext.Users.FirstOrDefault(u => u.UserName == username);
+
+                    if (existingUser != null)
                     {
-                        var existingUser = dbContext.Users.FirstOrDefault(u => u.UserName == username);
-
-                        if (existingUser != null)
-                        {
                         _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "User already exists!");
-                            EnableSubmitButton();       
-                            return;
-                        }
+                        EnableSubmitButton();       
+                        return;
+                    }
 
-                        _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, $"Registration successful!\n\nUsername: {newUser.UserName}\nPassword: {PasswordBox.Password}");
-                        await dbContext.AddUserAsync(newUser);
-                        UsernameTextBox.Clear();
-                        PasswordBox.Clear();
-                        KeyTextBox.Clear();
-                        SumbitButton.IsEnabled = false;
+                    _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, $"Registration successful!\n\nUsername: {newUser.UserName}\nPassword: {PasswordBox.Password}");
+                    await dbContext.AddUserAsync(newUser);
+                    UsernameTextBox.Clear();
+                    PasswordBox.Clear();
+                    KeyTextBox.Clear();
+                    SumbitButton.IsEnabled = false;
                     await Task.Delay(3500);
                     LoginUI loginUI = new LoginUI();
                     loginUI.Visibility = Visibility.Visible;
                     await Task.Delay(10);
-                    ((Window)Parent).Close();
+                    ((Window)Parent).Close(); 
                 }
             }
             catch (Exception ex)
@@ -166,7 +130,7 @@ namespace WasHere.ViewModel
             // Example using HttpClient:
             HttpClient client = new HttpClient();
             string apiUrl = "https://api.pwnedpasswords.com/range/";
-            string hash = CalculateSHA1Hash(password);
+            string hash = CalculateSha1Hash(password);
             string prefix = hash.Substring(0, 5);
             string suffix = hash.Substring(5);
             HttpResponseMessage response = await client.GetAsync(apiUrl + prefix);
@@ -181,8 +145,7 @@ namespace WasHere.ViewModel
                 return false;
             }
         }
-
-        private string CalculateSHA1Hash(string input)
+        private string CalculateSha1Hash(string input)
         {
             using (SHA1Managed sha1 = new SHA1Managed())
             {
@@ -196,19 +159,15 @@ namespace WasHere.ViewModel
                 return stringBuilder.ToString();
             }
         }
-
         private async void EnableSubmitButton()
         {
             // Delay for a short period before enabling the button to prevent spamming
             await Task.Delay(1000); // Adjust the delay time as needed
             SumbitButton.IsEnabled = true;
         }
-
-
         private void LogError(Exception ex)
         {
             string logFilePath = "error.log";
-
             try
             {
                 using (StreamWriter writer = new StreamWriter(logFilePath, true))
@@ -224,7 +183,6 @@ namespace WasHere.ViewModel
                 // Display a message to the user or handle the error as needed
             }
         }
-
         private async Task<string> GetPublicIpAddressAsync()
         {
             try
@@ -241,15 +199,12 @@ namespace WasHere.ViewModel
                 return "Error: Unable to retrieve public IP";
             }
         }
-
         private async void BackToLogin_Click(object sender, RoutedEventArgs e)
         {
-
             LoginUI loginUI = new LoginUI();
             loginUI.Visibility = Visibility.Visible;
             await Task.Delay(10);
             ((Window)Parent).Close();
         }
-
     }
 }
