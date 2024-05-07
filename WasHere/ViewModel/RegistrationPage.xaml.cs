@@ -25,6 +25,7 @@ namespace WasHere.ViewModel
             {
                 SumbitButton.IsEnabled = false;
 
+                // Get user input from the text boxes
                 string username = UsernameTextBox.Text;
                 string password = PasswordBox.Password;
                 string activationKey = KeyTextBox.Text;
@@ -32,6 +33,7 @@ namespace WasHere.ViewModel
                 string pcName = Environment.MachineName;
 
                 Utils.OutputManager.ClearOutput(OutputTextBlock);
+
 
                 // Check if IP address is null
                 if (string.IsNullOrEmpty(ipAddress))
@@ -45,11 +47,12 @@ namespace WasHere.ViewModel
                 bool isVpnUsed = await VpnChecker.IsVpnUsed(ipAddress);
 
                 if (isVpnUsed || CloudflareChecker.IsCloudflareWarpEnabled())
-                {
+                { 
                     _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Please disable your VPN connection before registering.");
-                    EnableSubmitButton();
+                    EnableSubmitButton(); 
                     return;
                 }
+
 
                 if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(activationKey))
                 {
@@ -71,14 +74,26 @@ namespace WasHere.ViewModel
                     return;
                 }
 
-                Utils.KeyAuthApi.KeyAuthApp.license(activationKey);
-                if (!Utils.KeyAuthApi.KeyAuthApp.response.success)
+
+
+                await Task.Run(() =>
+                {
+                    // Perform the initialization
+                    KeyAuthApp.init();
+                });
+
+
+
+                KeyAuthApp.license(activationKey);
+
+                if (!KeyAuthApp.response.success)
                 {
                     _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Invalid activation key. Please check and try again.");
                     KeyTextBox.Clear();
                     EnableSubmitButton();
                     return;
                 }
+
 
                 var hashed = BC.HashPassword(PasswordBox.Password);
                 User newUser = new User
@@ -98,9 +113,9 @@ namespace WasHere.ViewModel
                     if (existingUser != null)
                     {
                         _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "User already exists!");
-                        EnableSubmitButton();
-                        return;
-                    }
+                            EnableSubmitButton();       
+                            return;
+                        }
 
                     _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, $"Registration successful!\n\nUsername: {newUser.UserName}\nPassword: {PasswordBox.Password}");
                     await dbContext.AddUserAsync(newUser);
@@ -112,7 +127,7 @@ namespace WasHere.ViewModel
                     LoginUI loginUI = new LoginUI();
                     loginUI.Visibility = Visibility.Visible;
                     await Task.Delay(10);
-                    ((Window)Parent).Close();
+                    ((Window)Parent).Close(); 
                 }
             }
             catch (Exception ex)
