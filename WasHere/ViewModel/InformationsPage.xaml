@@ -72,8 +72,8 @@
 
                         <!-- Activation Key -->
                         <StackPanel Orientation="Horizontal" Margin="0,15">
-                            <TextBlock Text="Last Login:" FontFamily="{StaticResource Poppins}" FontWeight="Bold" FontSize="16" Foreground="White"/>
-                            <TextBlock Text="{Binding LastLogin}" FontFamily="{StaticResource Poppins}" FontWeight="Bold" FontSize="16" Foreground="White" Margin="5,0"/>
+                            <TextBlock Text="Expires in:" FontFamily="{StaticResource Poppins}" FontWeight="Bold" FontSize="16" Foreground="White"/>
+                            <TextBlock Text="{Binding Expiry}" FontFamily="{StaticResource Poppins}" FontWeight="Bold" FontSize="16" Foreground="White" Margin="5,0"/>
                         </StackPanel>
 
                     </StackPanel>

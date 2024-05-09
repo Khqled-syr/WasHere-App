@@ -67,6 +67,7 @@ namespace WasHere.ViewModel
                             _ = Utils.OutputManager.SetOutputAsync(
                                 OutputTextBlock,
                                 $"You have been banned!");
+                            Close();
                             return;
                         }
 
@@ -140,7 +141,7 @@ namespace WasHere.ViewModel
 
                 if (isVpnUsed || CloudflareChecker.IsCloudflareWarpEnabled())
                 {
-                    string errorMessage = "Please disable your VPN or Cloudflare Warp before logging in.";
+                    string errorMessage = "Please disable your VPN for better experiance!";
                     _ = MessageBox.Show(errorMessage, "VPN or Cloudflare Warp Detected", MessageBoxButton.OK, MessageBoxImage.Error);
                     Close();
                     return;

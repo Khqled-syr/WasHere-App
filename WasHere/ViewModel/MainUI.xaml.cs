@@ -68,7 +68,7 @@ namespace WasHere.ViewModel
 
             _ = Utils.OutputManager.SetOutputAsync(
                 OutputTextBlock,
-                "Loading Account settings..."
+                "Loading settings..."
             );
             AccountSettingsButton.IsEnabled = false;
             await Task.Delay(2500);

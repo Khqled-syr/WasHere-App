@@ -73,20 +73,13 @@ namespace WasHere.ViewModel
                     EnableSubmitButton();
                     return;
                 }
+                
 
 
 
-                await Task.Run(() =>
-                {
-                    // Perform the initialization
-                    KeyAuthApp.init();
-                });
+                Utils.KeyAuthApi.KeyAuthApp.license(activationKey);
 
-
-
-                KeyAuthApp.license(activationKey);
-
-                if (!KeyAuthApp.response.success)
+                if (!Utils.KeyAuthApi.KeyAuthApp.response.success)
                 {
                     _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "Invalid activation key. Please check and try again.");
                     KeyTextBox.Clear();

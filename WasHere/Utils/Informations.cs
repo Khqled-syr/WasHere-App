@@ -10,13 +10,17 @@ namespace WasHere.ViewModel
 {
     public class Informations : INotifyPropertyChanged
     {
-        // Old properties
-        private string? userName;
-        private DateTime? lastLogin;
+        private string windowsVersion;
+        private string publicIpAddress;
+        private string connectionType;
+        private Brush connectionStatusColor;
+
+        private string userName;
+        private DateTime? expiry;
         private DateTime? createDate;
         private readonly KeyAuthApi Api = new KeyAuthApi();
 
-        public string? UserName
+        public string UserName
         {
             get => userName;
             set
@@ -26,12 +30,12 @@ namespace WasHere.ViewModel
             }
         }
 
-        public DateTime? LastLogin
+        public DateTime? Expiry
         {
-            get => lastLogin;
+            get => expiry;
             set
             {
-                lastLogin = value;
+                expiry = value;
                 OnPropertyChanged();
             }
         }
@@ -46,13 +50,7 @@ namespace WasHere.ViewModel
             }
         }
 
-        // New properties
-        private string? windowsVersion;
-        private string? publicIpAddress;
-        private string? connectionType;
-        private Brush? connectionStatusColor;
-
-        public string? WindowsVersion
+        public string WindowsVersion
         {
             get => windowsVersion;
             set
@@ -62,7 +60,7 @@ namespace WasHere.ViewModel
             }
         }
 
-        public string? PublicIpAddress
+        public string PublicIpAddress
         {
             get { return publicIpAddress; }
             set
@@ -75,13 +73,13 @@ namespace WasHere.ViewModel
             }
         }
 
-        public string? ConnectionType
+        public string ConnectionType
         {
             get => connectionType;
             set { connectionType = value; OnPropertyChanged(); }
         }
 
-        public Brush? ConnectionStatusColor
+        public Brush ConnectionStatusColor
         {
             get => connectionStatusColor;
             set { connectionStatusColor = value; OnPropertyChanged(); }
@@ -91,7 +89,10 @@ namespace WasHere.ViewModel
         {
             // Old properties initialization
             UserName = App.user.UserName;
-            lastLogin = Api.UnixTimeToDateTime(long.Parse(KeyAuthApi.KeyAuthApp.user_data.lastlogin)) ;
+            for (var i = 0; i < KeyAuthApi.KeyAuthApp.user_data.subscriptions.Count; i++)
+            {
+                expiry = Api.UnixTimeToDateTime(long.Parse(KeyAuthApi.KeyAuthApp.user_data.subscriptions[i].expiry));
+            }
             CreateDate = Api.UnixTimeToDateTime(long.Parse(KeyAuthApi.KeyAuthApp.user_data.createdate));
 
             // New properties initialization
@@ -101,7 +102,7 @@ namespace WasHere.ViewModel
             UpdateConnectionStatus();
         }
 
-        public static string? GetWindowsEdition()
+        public static string GetWindowsEdition()
         {
             ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_OperatingSystem");
             foreach (ManagementObject os in searcher.Get())
@@ -140,7 +141,7 @@ namespace WasHere.ViewModel
             return ipAddress;
         }
 
-        private string? GetConnectionType()
+        private string GetConnectionType()
         {
             NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
 
@@ -169,9 +170,9 @@ namespace WasHere.ViewModel
             return NetworkInterface.GetIsNetworkAvailable();
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
