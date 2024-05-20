@@ -1,34 +1,96 @@
-﻿using System.Windows;
+﻿using System.Runtime.InteropServices.JavaScript;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using WasHere.Database;
+using WasHere.Utils;
 
 namespace WasHere.ViewModel
 {
     public partial class MainUI : Window
     {
+        
+        private Status _status;
+        private DispatcherTimer _timer;
+        private DateTime _lastUpdateTime;
+
         public MainUI()
         {
             InitializeComponent();
             OnLoaderStartUp();
+            CheckVpnOnStartUp();
+            CheckUserPermission();
+            _status = new Status();
         }
-        private void OnLoaderStartUp()
+
+        public void CheckUserPermission()
+        {
+            var viewModel = DataContext as Status;
+            if (viewModel != null)
+            {
+                viewModel.IsAdmin = PermsChecker.IsCurrentUserAdmin();
+            }
+        }
+
+        private async void CheckVpnOnStartUp()
+        {
+            while (true)
+            {
+
+                    string ipAddress = await GetIPAddress.GetPublicIpAddressAsync();
+
+                    bool isVpnUsed = await VpnChecker.IsVpnUsed(ipAddress);
+
+                    if (isVpnUsed || CloudflareChecker.IsCloudflareWarpEnabled())
+                    {
+                        string errorMessage = "Please disable your VPN for better experiance!";
+                        _ = MessageBox.Show(errorMessage, "VPN or Cloudflare Warp Detected", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Close();
+                        return;
+                    }
+                    await Task.Delay(TimeSpan.FromSeconds(1));
+
+            }
+        }
+
+        private async void OnLoaderStartUp()
         {
             if (App.user != null)
             {
-                using (var DbContext = new DatabaseContext())
+                using var dbContext = new DatabaseContext();
+                UserTitle.Text = $"{App.user.UserName.ToUpper()}!";
+
+                await Utils.OutputManager.SetOutputAsync(OutputTextBlock, GetFormattedMsg());
+
+                _timer = new DispatcherTimer
                 {
-                    UserTitle.Text = $"{App.user.UserName}!";
-                    _ = Utils.OutputManager.SetOutputAsync(
-                        OutputTextBlock,
-                        $"Welcome {App.user.UserName}"
-                    );
-                }
+                    Interval = TimeSpan.FromSeconds(1)
+                };
+                _timer.Tick += Timer_Tick;
+                _timer.Start();
             }
             else
             {
                 MessageBox.Show("Error");
             }
         }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            var currentTime = DateTime.Now;
+            if (currentTime.Second != _lastUpdateTime.Second)
+            {
+                OutputTextBlock.Text = GetFormattedMsg();
+                _lastUpdateTime = currentTime;
+            }
+        }
+
+        private string GetFormattedMsg()
+        {
+            return $"Welcome {App.user.UserName.ToUpper()}!\n{DateTime.Now.ToString()}";
+        }
+
+
         private async void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             _ = Utils.OutputManager.SetOutputAsync(
@@ -42,6 +104,7 @@ namespace WasHere.ViewModel
         {
             try
             {
+                await _status.StartOptimizationProcess();
                 await Utils.SystemCommands.ClearSystemCache();
                 _ = Utils.OutputManager.SetOutputAsync(
                     OutputTextBlock,
@@ -62,17 +125,17 @@ namespace WasHere.ViewModel
 
         }
 
-        private async void AccountButton(object sender, RoutedEventArgs e)
+        private async void UsersButton_Click(object sender, RoutedEventArgs e)
         {
-            AccountSettingsButton.IsEnabled = true;
+              UsersEditButton.IsEnabled = true;
 
             _ = Utils.OutputManager.SetOutputAsync(
                 OutputTextBlock,
-                "Loading settings..."
+                "Loading Users Page..."
             );
-            AccountSettingsButton.IsEnabled = false;
+            UsersEditButton.IsEnabled = false;
             await Task.Delay(2500);
-            this.Content = new InformationsPage();
+            this.Content = new UsersEditPage();
         }
 
         private void CloseAppBtn_Click(object sender, RoutedEventArgs e)

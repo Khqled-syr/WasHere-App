@@ -615,6 +615,27 @@ namespace WasHere.ViewModel
             var json = response_decoder.string_to_generic<response_structure>(response);
             load_response_struct(json);
         }
+
+        public void ban(string user, string reason = null)
+        {
+            CheckInit();
+
+            var values_to_upload = new NameValueCollection
+            {
+                ["type"] = "ban",
+                ["reason"] = reason,
+                ["sessionid"] = sessionid,
+                ["name"] = user,
+                ["ownerid"] = ownerid
+            };
+
+            var response = req(values_to_upload);
+
+            var json = response_decoder.string_to_generic<response_structure>(response);
+            load_response_struct(json);
+        }
+
+
         /// <summary>
         /// Gets an existing global variable
         /// </summary>

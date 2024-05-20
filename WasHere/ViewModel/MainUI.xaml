@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:Icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:utils="clr-namespace:WasHere.Utils"
         AllowsTransparency="True" Background="#CC000000"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         MouseMove="Window_MouseMove"
@@ -9,7 +10,8 @@
         Height="450" Width="800"
         Title="WasHere"
         Icon="/Resources/icon.ico"
-        WindowStyle="None" WindowStartupLocation="CenterScreen">
+        WindowStyle="None" WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
 
     <Window.Resources>
         <Style x:Key="RoundedWindowStyle" TargetType="Window">
@@ -23,32 +25,30 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Window.Resources>
-
-    <!-- Apply the custom window style to your window -->
+    
+    <Window.DataContext>
+        <utils:Status/>
+    </Window.DataContext>
+    
     <Window.Style>
         <StaticResource ResourceKey="RoundedWindowStyle"/>
     </Window.Style>
 
-
     <Grid>
-        <!-- Title -->
         <!-- Title -->
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,40,0,0">
             <TextBlock Text="WasHere Tweaker " FontSize="24" FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White"/>
-            <!-- Separator line -->
             <Separator VerticalAlignment="Top" Height="2" Background="White" Margin="0,10,0,0"/>
         </StackPanel>
 
-        <StackPanel Margin="518,52,167,362" >
+        <StackPanel Margin="518,52,167,362">
             <Icon:PackIconMaterial Kind="Tools" Foreground="White" Height="26" Width="29"/>
         </StackPanel>
 
-
-        <!--User Title-->
-        <!--<Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="15" Margin="10,10,575,394" Padding="10">
-            <TextBlock x:Name="UserTitle" Text="Logged in as: ...." FontFamily="{StaticResource PoppinsSemiBold}" FontSize="15" FontStyle="Oblique" Foreground="LightGray" Opacity="1" Margin="0,0,65,0"/>
-        </Border>-->
+        <!-- User Title -->
         <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="15" Margin="10,10,575,394" Padding="10">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -56,15 +56,11 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock x:Name="UserTitle" Text="Logged in as: .... " TextDecorations="Underline" HorizontalAlignment="Left" FontFamily="{StaticResource PoppinsSemiBold}" FontSize="15" FontStyle="Oblique" Foreground="LightGray" Opacity="1" Margin="-2,0,0,0" Width="138" Grid.ColumnSpan="2"/>
-                <Button x:Name="AccountSettingsButton" Click="AccountButton" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button x:Name="UsersEditButton" Click="UsersButton_Click" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Icon:PackIconMaterial Kind="AccountEdit" Background="LightGray"/>
                 </Button>
             </Grid>
         </Border>
-
-
-
-
 
         <!-- Close Button -->
         <StackPanel Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,10,0">
@@ -72,8 +68,6 @@
                 <Icon:PackIconMaterial Kind="Close" Foreground="Gray" Background="Transparent"/>
             </Button>
         </StackPanel>
-
-
 
         <!-- Output Title -->
         <TextBlock Text="Output" FontSize="24" HorizontalAlignment="Right" VerticalAlignment="Top" FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White" Margin="0,117,88,0"/>
@@ -91,7 +85,14 @@
                 </TextBlock.RenderTransform>
             </TextBlock>
         </Border>
-
+        
+        <!-- Status Indicator -->
+        <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Center" Margin="12,154,550,146" Padding="10" CornerRadius="20">
+            <StackPanel Orientation="Horizontal">
+                <Ellipse Width="20" Height="20" Fill="Green" Margin="0,0,10,0"/> <!-- Example: Green color represents a positive status -->
+                <TextBlock x:Name="OptimizationStatusIndicator" Text="Optimizing..." FontSize="16" FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White" Visibility="{Binding OptimizationInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </StackPanel>
+        </Border>
 
         <!-- Main content -->
         <Grid VerticalAlignment="Top" Margin="4,323,454,0" Height="114">
@@ -100,17 +101,15 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-
             <!-- Buttons -->
             <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,50,10,0">
                 <Button Content="OPTIMIZE" FontFamily="{StaticResource PoppinsExtraBold}" Click="SystemCommands_Button" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Margin="5"/>
                 <Button Content="Boost FPS" FontFamily="{StaticResource PoppinsExtraBold}" Click="Boostfps_Button" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Margin="5"/>
                 <Button Content="Button 3" FontFamily="{StaticResource PoppinsExtraBold}" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Margin="5"/>
             </StackPanel>
-
-            <!-- Settings Button -->
         </Grid>
 
+        <!-- Settings Button -->
         <Button Grid.Row="0" FontFamily="{StaticResource PoppinsExtraBold}" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Click="SettingsButton_Click" HorizontalAlignment="Right" Margin="0,376,15,24">
             <StackPanel Orientation="Horizontal">
                 <Icon:PackIconMaterial Kind="AccountSettings" VerticalAlignment="Center" Foreground="White"/>

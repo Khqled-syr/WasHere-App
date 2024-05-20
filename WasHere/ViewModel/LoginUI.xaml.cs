@@ -3,19 +3,42 @@ using System.Windows;
 using System.Windows.Input;
 using WasHere.Database;
 using WasHere.Utils;
+using Windows.UI.Shell;
 using BC = BCrypt.Net.BCrypt;
+using WasHere.Settings;
 
 namespace WasHere.ViewModel
 {
     public partial class LoginUI : Window
     {
+
+        private bool windowMovedByUser = false;
+
         public LoginUI()
         {
             InitializeComponent();
             CheckVpnOnStartUp();
             KeyAuthApi.KeyAuthApp.init();
 
+            // Set the initial WindowStartupLocation
+            if (Settings.Settings.Default.IsFirstLaunch)
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                Settings.Settings.Default.IsFirstLaunch = false;
+            }
+            else
+            {
+                WindowStartupLocation = WindowStartupLocation.Manual;
+                Left = Settings.Settings.Default.WindowLeft;
+                Top = Settings.Settings.Default.WindowTop;
+            }
+
+            UserTextBox.Text = Settings.Settings.Default.LastUsername;
+            Settings.Settings.Default.Save();
+
         }
+
+
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             var username = UserTextBox.Text;
@@ -39,7 +62,7 @@ namespace WasHere.ViewModel
 
             try
             {
-                userIP = await GetPublicIpAddressAsync();
+                userIP = await GetIPAddress.GetPublicIpAddressAsync();
             }
             catch (Exception ex)
             {
@@ -64,9 +87,7 @@ namespace WasHere.ViewModel
                         if (Utils.KeyAuthApi.KeyAuthApp.checkblack())
                         {
                             await Task.Delay(20);
-                            _ = Utils.OutputManager.SetOutputAsync(
-                                OutputTextBlock,
-                                $"You have been banned!");
+                            _ = MessageBox.Show($"You are banned LOL!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                             Close();
                             return;
                         }
@@ -83,6 +104,8 @@ namespace WasHere.ViewModel
                                 OutputTextBlock,
                                 $"Succesfully logged in!"
                             );
+                            Settings.Settings.Default.LastUsername = username;
+                            Settings.Settings.Default.Save();
 
                             App.user = user;
                             await Task.Delay(2500);
@@ -99,6 +122,7 @@ namespace WasHere.ViewModel
                                 OutputTextBlock,
                                 $"Activation key has been expired!"
                              );
+                            LoginButton.IsEnabled = true;
                             return;
                         }
                     }
@@ -135,40 +159,31 @@ namespace WasHere.ViewModel
         {
             while (true)
             {
-                string ipAddress = await GetPublicIpAddressAsync();
+                string ipAddress = await GetIPAddress.GetPublicIpAddressAsync();
 
                 bool isVpnUsed = await VpnChecker.IsVpnUsed(ipAddress);
 
                 if (isVpnUsed || CloudflareChecker.IsCloudflareWarpEnabled())
                 {
                     string errorMessage = "Please disable your VPN for better experiance!";
-                    _ = MessageBox.Show(errorMessage, "VPN or Cloudflare Warp Detected", MessageBoxButton.OK, MessageBoxImage.Error);
+                    //_ = MessageBox.Show(errorMessage, "VPN or Cloudflare Warp Detected", MessageBoxButton.OK, MessageBoxImage.Error);
+                    _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, errorMessage);
+                    UserTextBox.IsEnabled = false;
+                    PasswordBox.IsEnabled = false;
+                    LoginButton.IsEnabled = false;
+                    RegisterButton.IsEnabled = false;
+                    await Task.Delay(5000);
                     Close();
                     return;
                 }
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
         }
-        private async Task<string> GetPublicIpAddressAsync()
-        {
-            using (var client = new HttpClient())
-            {
-                try
-                {
-                    // Use the ipinfo.io API to fetch the public IP address
-                    return await client.GetStringAsync("https://ipinfo.io/ip");
-                }
-                catch (Exception ex)
-                {
-                    // Handle exceptions, such as network errors
-                    return $"Error: {ex.Message}";
-                }
-            }
-        }
         private void RegisterButton_Click(object sender, RoutedEventArgs e)
         {
             Content = new RegistrationPage();
         }
+
 
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -179,15 +194,29 @@ namespace WasHere.ViewModel
         {
             DragMove();
         }
+
+
         private void Window_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            if (e.LeftButton == MouseButtonState.Pressed && !windowMovedByUser)
             {
-                DragMove();
+                windowMovedByUser = true;
             }
         }
 
-        private void Window_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void Window_LocationChanged(object sender, EventArgs e)
+        {
+            if (!windowMovedByUser)
+            {
+                // Only save the window position if it was moved by the user
+                Settings.Settings.Default.WindowLeft = Left;
+                Settings.Settings.Default.WindowTop = Top;
+                Settings.Settings.Default.Save();
+            }
+        }
+
+
+            private void Window_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             // Stop dragging the window
         }

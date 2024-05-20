@@ -18,6 +18,7 @@ namespace WasHere.ViewModel
             // Perform the initialization
             InitializeComponent();
             Utils.KeyAuthApi.KeyAuthApp.init();
+
         }
         private async void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
@@ -29,7 +30,7 @@ namespace WasHere.ViewModel
                 string username = UsernameTextBox.Text;
                 string password = PasswordBox.Password;
                 string activationKey = KeyTextBox.Text;
-                string ipAddress = await GetPublicIpAddressAsync();
+                string ipAddress = await GetIPAddress.GetPublicIpAddressAsync();
                 string pcName = Environment.MachineName;
 
                 Utils.OutputManager.ClearOutput(OutputTextBlock);
@@ -73,8 +74,6 @@ namespace WasHere.ViewModel
                     EnableSubmitButton();
                     return;
                 }
-                
-
 
 
                 Utils.KeyAuthApi.KeyAuthApp.license(activationKey);
@@ -108,7 +107,7 @@ namespace WasHere.ViewModel
                         _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, "User already exists!");
                             EnableSubmitButton();       
                             return;
-                        }
+                    }
 
                     _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, $"Registration successful!\n\nUsername: {newUser.UserName}\nPassword: {PasswordBox.Password}");
                     await dbContext.AddUserAsync(newUser);
@@ -116,11 +115,16 @@ namespace WasHere.ViewModel
                     PasswordBox.Clear();
                     KeyTextBox.Clear();
                     SumbitButton.IsEnabled = false;
-                    await Task.Delay(3500);
+
+                    await Task.Delay(3000);
+
+
+                    
                     LoginUI loginUI = new LoginUI();
                     loginUI.Visibility = Visibility.Visible;
                     await Task.Delay(10);
-                    ((Window)Parent).Close(); 
+                    ((Window)Parent).Close();
+
                 }
             }
             catch (Exception ex)
@@ -189,22 +193,6 @@ namespace WasHere.ViewModel
             {
                 // Failed to write to log file
                 // Display a message to the user or handle the error as needed
-            }
-        }
-        private async Task<string> GetPublicIpAddressAsync()
-        {
-            try
-            {
-                string ipAddress;
-                using (var client = new HttpClient())
-                {
-                    ipAddress = await client.GetStringAsync("https://api64.ipify.org");
-                }
-                return ipAddress;
-            }
-            catch (Exception)
-            {
-                return "Error: Unable to retrieve public IP";
             }
         }
         private async void BackToLogin_Click(object sender, RoutedEventArgs e)
