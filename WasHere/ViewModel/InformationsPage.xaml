@@ -75,10 +75,19 @@
                             <TextBlock Text="Expires in:" FontFamily="{StaticResource Poppins}" FontWeight="Bold" FontSize="16" Foreground="White"/>
                             <TextBlock Text="{Binding Expiry}" FontFamily="{StaticResource Poppins}" FontWeight="Bold" FontSize="16" Foreground="White" Margin="5,0"/>
                         </StackPanel>
-
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
         </Grid>
+
+        <!-- Logout Button -->
+        <Button Grid.Row="0" FontFamily="{StaticResource PoppinsExtraBold}" Style="{StaticResource CustomButtonStyle}" Width="100" Height="50" Click="LogoutButton_Click" HorizontalAlignment="Right" Margin="0,376,15,24">
+            <StackPanel Orientation="Horizontal">
+                <Icon:PackIconMaterial Kind="Logout" VerticalAlignment="Center" Foreground="White"/>
+                <TextBlock Text="Logout" Margin="5,0,0,0" VerticalAlignment="Center" Foreground="White"/>
+            </StackPanel>
+        </Button>
+
+
     </Grid>
 </Page>

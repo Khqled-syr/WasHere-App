@@ -6,6 +6,7 @@ using WasHere.Utils;
 using Windows.UI.Shell;
 using BC = BCrypt.Net.BCrypt;
 using WasHere.Settings;
+using System.Windows.Controls;
 
 namespace WasHere.ViewModel
 {
@@ -34,8 +35,9 @@ namespace WasHere.ViewModel
             }
 
             UserTextBox.Text = Settings.Settings.Default.LastUsername;
+            PasswordBox.Password = Settings.Settings.Default.LastPassword;
+            
             Settings.Settings.Default.Save();
-
         }
 
 
@@ -105,6 +107,7 @@ namespace WasHere.ViewModel
                                 $"Succesfully logged in!"
                             );
                             Settings.Settings.Default.LastUsername = username;
+                            Settings.Settings.Default.LastPassword = password;
                             Settings.Settings.Default.Save();
 
                             App.user = user;

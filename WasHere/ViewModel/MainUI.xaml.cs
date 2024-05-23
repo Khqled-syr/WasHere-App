@@ -10,9 +10,10 @@ namespace WasHere.ViewModel
     public partial class MainUI : Window
     {
         
-        private Status _status;
+        private PermsChecker _permsChecker;
         private DispatcherTimer _timer;
         private DateTime _lastUpdateTime;
+        private bool windowMovedByUser = false;
 
         public MainUI()
         {
@@ -20,12 +21,26 @@ namespace WasHere.ViewModel
             OnLoaderStartUp();
             CheckVpnOnStartUp();
             CheckUserPermission();
-            _status = new Status();
+            _permsChecker = new PermsChecker();
+
+            // Set the initial WindowStartupLocation
+            if (Settings.Settings.Default.IsFirstLaunch)
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                Settings.Settings.Default.IsFirstLaunch = false;
+            }
+            else
+            {
+                WindowStartupLocation = WindowStartupLocation.Manual;
+                Left = Settings.Settings.Default.WindowLeft;
+                Top = Settings.Settings.Default.WindowTop;
+            }
+
         }
 
         public void CheckUserPermission()
         {
-            var viewModel = DataContext as Status;
+            var viewModel = DataContext as PermsChecker;
             if (viewModel != null)
             {
                 viewModel.IsAdmin = PermsChecker.IsCurrentUserAdmin();
@@ -36,19 +51,18 @@ namespace WasHere.ViewModel
         {
             while (true)
             {
+                string ipAddress = await GetIPAddress.GetPublicIpAddressAsync();
 
-                    string ipAddress = await GetIPAddress.GetPublicIpAddressAsync();
+                bool isVpnUsed = await VpnChecker.IsVpnUsed(ipAddress);
 
-                    bool isVpnUsed = await VpnChecker.IsVpnUsed(ipAddress);
-
-                    if (isVpnUsed || CloudflareChecker.IsCloudflareWarpEnabled())
-                    {
-                        string errorMessage = "Please disable your VPN for better experiance!";
-                        _ = MessageBox.Show(errorMessage, "VPN or Cloudflare Warp Detected", MessageBoxButton.OK, MessageBoxImage.Error);
-                        Close();
-                        return;
-                    }
-                    await Task.Delay(TimeSpan.FromSeconds(1));
+                if (isVpnUsed || CloudflareChecker.IsCloudflareWarpEnabled())
+                {
+                    string errorMessage = "Please disable your VPN for better experiance!";
+                    _ = MessageBox.Show(errorMessage, "VPN or Cloudflare Warp Detected", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Close();
+                    return;
+                }
+                await Task.Delay(TimeSpan.FromSeconds(1));
 
             }
         }
@@ -59,15 +73,11 @@ namespace WasHere.ViewModel
             {
                 using var dbContext = new DatabaseContext();
                 UserTitle.Text = $"{App.user.UserName.ToUpper()}!";
+                
 
                 await Utils.OutputManager.SetOutputAsync(OutputTextBlock, GetFormattedMsg());
 
-                _timer = new DispatcherTimer
-                {
-                    Interval = TimeSpan.FromSeconds(1)
-                };
-                _timer.Tick += Timer_Tick;
-                _timer.Start();
+                ScheduleNextUpdate();
             }
             else
             {
@@ -75,21 +85,37 @@ namespace WasHere.ViewModel
             }
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private void ScheduleNextUpdate()
         {
             var currentTime = DateTime.Now;
-            if (currentTime.Second != _lastUpdateTime.Second)
+            var nextMinute = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, currentTime.Minute, 0).AddMinutes(1);
+            var timeUntilNextMinute = nextMinute - currentTime;
+
+            _timer = new DispatcherTimer
             {
-                OutputTextBlock.Text = GetFormattedMsg();
-                _lastUpdateTime = currentTime;
-            }
+                Interval = timeUntilNextMinute
+            };
+            _timer.Tick += Timer_Tick;
+            _timer.Start();
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            // Stop the current timer
+            _timer.Stop();
+            _timer.Tick -= Timer_Tick;
+
+            // Update the UI
+            OutputTextBlock.Text = GetFormattedMsg();
+
+            // Schedule the next update
+            ScheduleNextUpdate();
         }
 
         private string GetFormattedMsg()
         {
-            return $"Welcome {App.user.UserName.ToUpper()}!\n{DateTime.Now.ToString()}";
+            return $"Welcome {App.user.UserName.ToUpper()}!\nLogged in at: {DateTime.Now.ToString("HH:mm tt")}\nLast Login: {KeyAuthApi.UnixTimeToString(long.Parse(KeyAuthApi.KeyAuthApp.user_data.lastlogin))}";
         }
-
 
         private async void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
@@ -97,14 +123,15 @@ namespace WasHere.ViewModel
                 OutputTextBlock,
                 "Loading settings..."
                 );
+
             await Task.Delay(2500);
             this.Content = new InformationsPage();
         }
+
         private async void SystemCommands_Button(object sender, RoutedEventArgs e)
         {
             try
             {
-                await _status.StartOptimizationProcess();
                 await Utils.SystemCommands.ClearSystemCache();
                 _ = Utils.OutputManager.SetOutputAsync(
                     OutputTextBlock,
@@ -149,9 +176,20 @@ namespace WasHere.ViewModel
         }
         private void Window_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            if (e.LeftButton == MouseButtonState.Pressed && !windowMovedByUser)
             {
-                DragMove();
+                windowMovedByUser = true;
+            }
+        }
+
+        private void Window_LocationChanged(object sender, EventArgs e)
+        {
+            if (!windowMovedByUser)
+            {
+                // Only save the window position if it was moved by the user
+                Settings.Settings.Default.WindowLeft = Left;
+                Settings.Settings.Default.WindowTop = Top;
+                Settings.Settings.Default.Save();
             }
         }
 

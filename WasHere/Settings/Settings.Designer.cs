@@ -58,15 +58,29 @@ namespace WasHere.Settings {
                 this["IsFirstLaunch"] = value;
             }
         }
-        // Define the LastUsername property
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string LastUsername
-        {
-            get { return (string)this["LastUsername"]; }
-            set { this["LastUsername"] = value; }
+        public string LastUsername {
+            get {
+                return ((string)(this["LastUsername"]));
+            }
+            set {
+                this["LastUsername"] = value;
+            }
         }
-
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastPassword {
+            get {
+                return ((string)(this["LastPassword"]));
+            }
+            set {
+                this["LastPassword"] = value;
+            }
+        }
     }
 }

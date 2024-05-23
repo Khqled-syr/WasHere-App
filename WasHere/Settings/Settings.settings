@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="WasHere.Settings" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="WindowLeft" Type="System.Double" Scope="User">
@@ -10,6 +10,12 @@
     </Setting>
     <Setting Name="IsFirstLaunch" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">true</Value>
+    </Setting>
+    <Setting Name="LastUsername" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LastPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

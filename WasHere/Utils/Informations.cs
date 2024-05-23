@@ -18,7 +18,6 @@ namespace WasHere.ViewModel
         private string userName;
         private DateTime? expiry;
         private DateTime? createDate;
-        private readonly KeyAuthApi Api = new KeyAuthApi();
 
         public string UserName
         {
@@ -91,9 +90,9 @@ namespace WasHere.ViewModel
             UserName = App.user.UserName;
             for (var i = 0; i < KeyAuthApi.KeyAuthApp.user_data.subscriptions.Count; i++)
             {
-                expiry = Api.UnixTimeToDateTime(long.Parse(KeyAuthApi.KeyAuthApp.user_data.subscriptions[i].expiry));
+                expiry = KeyAuthApi.UnixTimeToDateTime(long.Parse(KeyAuthApi.KeyAuthApp.user_data.subscriptions[i].expiry));
             }
-            CreateDate = Api.UnixTimeToDateTime(long.Parse(KeyAuthApi.KeyAuthApp.user_data.createdate));
+            CreateDate = KeyAuthApi.UnixTimeToDateTime(long.Parse(KeyAuthApi.KeyAuthApp.user_data.createdate));
 
             // New properties initialization
             WindowsVersion = GetWindowsEdition();

@@ -111,19 +111,19 @@ namespace WasHere.ViewModel
 
                     _ = Utils.OutputManager.SetOutputAsync(OutputTextBlock, $"Registration successful!\n\nUsername: {newUser.UserName}\nPassword: {PasswordBox.Password}");
                     await dbContext.AddUserAsync(newUser);
+
                     UsernameTextBox.Clear();
                     PasswordBox.Clear();
                     KeyTextBox.Clear();
+
                     SumbitButton.IsEnabled = false;
-
-                    await Task.Delay(3000);
-
-
+                    await Task.Delay(3500);
                     
                     LoginUI loginUI = new LoginUI();
                     loginUI.Visibility = Visibility.Visible;
-                    await Task.Delay(10);
-                    ((Window)Parent).Close();
+
+                    Window parentWindow = (Window)this.Parent;
+                    parentWindow.Close();
 
                 }
             }

@@ -33,7 +33,7 @@ namespace WasHere.Utils
             {
                 outputTextBlock.Text += outputText[currentIndex];
                 currentIndex++;
-                await Task.Delay(50); // Adjust typing speed here
+                await Task.Delay(25); // Adjust typing speed here
             }
         }
     }

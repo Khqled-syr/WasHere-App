@@ -12,7 +12,7 @@ public static Api KeyAuthApp = new Api(
 );
 
 
-    public DateTime UnixTimeToDateTime(long unixtime)
+    public static DateTime UnixTimeToDateTime(long unixtime)
     {
         System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Local);
 
@@ -25,5 +25,21 @@ public static Api KeyAuthApp = new Api(
             dtDateTime = DateTime.MaxValue;
         }
         return dtDateTime;
+    }
+
+
+    public static string UnixTimeToString(long unixtime)
+    {
+        System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+
+        try
+        {
+            dtDateTime = dtDateTime.AddSeconds(unixtime).ToLocalTime();
+        }
+        catch
+        {
+            return DateTime.MaxValue.ToString("dd/MM/yyyy HH:mm tt");
+        }
+        return dtDateTime.ToString("dd/MM/yyyy HH:mm tt");
     }
 }

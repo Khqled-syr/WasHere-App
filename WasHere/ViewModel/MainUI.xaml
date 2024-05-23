@@ -7,10 +7,11 @@
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         MouseMove="Window_MouseMove"
         MouseLeftButtonUp="Window_MouseLeftButtonUp" 
+        LocationChanged="Window_LocationChanged"
         Height="450" Width="800"
         Title="WasHere"
         Icon="/Resources/icon.ico"
-        WindowStyle="None" WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
         ResizeMode="NoResize">
 
     <Window.Resources>
@@ -30,7 +31,7 @@
     </Window.Resources>
     
     <Window.DataContext>
-        <utils:Status/>
+        <utils:PermsChecker/>
     </Window.DataContext>
     
     <Window.Style>
@@ -57,7 +58,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock x:Name="UserTitle" Text="Logged in as: .... " TextDecorations="Underline" HorizontalAlignment="Left" FontFamily="{StaticResource PoppinsSemiBold}" FontSize="15" FontStyle="Oblique" Foreground="LightGray" Opacity="1" Margin="-2,0,0,0" Width="138" Grid.ColumnSpan="2"/>
                 <Button x:Name="UsersEditButton" Click="UsersButton_Click" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <Icon:PackIconMaterial Kind="AccountEdit" Background="LightGray"/>
+                    <Icon:PackIconMaterial Kind="AccountEdit" Background="Transparent" Foreground="Black"/>
                 </Button>
             </Grid>
         </Border>
@@ -85,14 +86,7 @@
                 </TextBlock.RenderTransform>
             </TextBlock>
         </Border>
-        
-        <!-- Status Indicator -->
-        <Border BorderBrush="White" BorderThickness="1" VerticalAlignment="Center" Margin="12,154,550,146" Padding="10" CornerRadius="20">
-            <StackPanel Orientation="Horizontal">
-                <Ellipse Width="20" Height="20" Fill="Green" Margin="0,0,10,0"/> <!-- Example: Green color represents a positive status -->
-                <TextBlock x:Name="OptimizationStatusIndicator" Text="Optimizing..." FontSize="16" FontFamily="{StaticResource Poppins}" FontWeight="Bold" Foreground="White" Visibility="{Binding OptimizationInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-            </StackPanel>
-        </Border>
+
 
         <!-- Main content -->
         <Grid VerticalAlignment="Top" Margin="4,323,454,0" Height="114">
@@ -116,5 +110,8 @@
                 <TextBlock Text="Settings" Margin="5,0,0,0" VerticalAlignment="Center" Foreground="White"/>
             </StackPanel>
         </Button>
+        
+        
+        
     </Grid>
 </Window>
