@@ -1,5 +1,10 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
 using WasHere.Database;
+using WasHere.ViewModel;
+using Windows.ApplicationModel.Activation;
+using Windows.UI;
 
 namespace WasHere
 {
@@ -12,7 +17,6 @@ namespace WasHere
         {
             ShutdownMode = ShutdownMode.OnLastWindowClose;
         }
-
     }
 
 }

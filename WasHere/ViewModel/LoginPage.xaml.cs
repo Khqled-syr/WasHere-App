@@ -1,42 +1,38 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 using WasHere.Database;
 using WasHere.Utils;
-using Windows.UI.Shell;
 using BC = BCrypt.Net.BCrypt;
-using WasHere.Settings;
-using System.Windows.Controls;
 
 namespace WasHere.ViewModel
 {
-    public partial class LoginUI : Window
+    /// <summary>
+    /// Interaction logic for LoginPage.xaml
+    /// </summary>
+    public partial class LoginPage : Page
     {
-
-        private bool windowMovedByUser = false;
-
-        public LoginUI()
+        public LoginPage()
         {
             InitializeComponent();
             CheckVpnOnStartUp();
             KeyAuthApi.KeyAuthApp.init();
 
-            // Set the initial WindowStartupLocation
-            if (Settings.Settings.Default.IsFirstLaunch)
-            {
-                WindowStartupLocation = WindowStartupLocation.CenterScreen;
-                Settings.Settings.Default.IsFirstLaunch = false;
-            }
-            else
-            {
-                WindowStartupLocation = WindowStartupLocation.Manual;
-                Left = Settings.Settings.Default.WindowLeft;
-                Top = Settings.Settings.Default.WindowTop;
-            }
 
             UserTextBox.Text = Settings.Settings.Default.LastUsername;
             PasswordBox.Password = Settings.Settings.Default.LastPassword;
-            
+
             Settings.Settings.Default.Save();
         }
 
@@ -90,7 +86,6 @@ namespace WasHere.ViewModel
                         {
                             await Task.Delay(20);
                             _ = MessageBox.Show($"You are banned LOL!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                            Close();
                             return;
                         }
 
@@ -112,10 +107,8 @@ namespace WasHere.ViewModel
 
                             App.user = user;
                             await Task.Delay(2500);
+                            NavigationService.Navigate(new MainPage());
 
-                            var mainUI = new MainUI();
-                            mainUI.Show();
-                            Close();
                         }
                         else if (Utils.KeyAuthApi.KeyAuthApp.response.success == false)
                         {
@@ -176,53 +169,10 @@ namespace WasHere.ViewModel
                     LoginButton.IsEnabled = false;
                     RegisterButton.IsEnabled = false;
                     await Task.Delay(5000);
-                    Close();
                     return;
                 }
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
         }
-        private void RegisterButton_Click(object sender, RoutedEventArgs e)
-        {
-            Content = new RegistrationPage();
-        }
-
-
-        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
-        {
-            // Minimize the window
-            WindowState = WindowState.Minimized;
-        }
-        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            DragMove();
-        }
-
-
-        private void Window_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed && !windowMovedByUser)
-            {
-                windowMovedByUser = true;
-            }
-        }
-
-        private void Window_LocationChanged(object sender, EventArgs e)
-        {
-            if (!windowMovedByUser)
-            {
-                // Only save the window position if it was moved by the user
-                Settings.Settings.Default.WindowLeft = Left;
-                Settings.Settings.Default.WindowTop = Top;
-                Settings.Settings.Default.Save();
-            }
-        }
-
-
-            private void Window_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            // Stop dragging the window
-        }
-        private void CloseAppBtn_Click(object sender, RoutedEventArgs e) => Close();
     }
 }

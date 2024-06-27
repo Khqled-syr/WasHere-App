@@ -1,0 +1,30 @@
+﻿<Window x:Class="WasHere.ViewModel.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WasHere.ViewModel"
+        mc:Ignorable="d"
+        AllowsTransparency="True" Background="#CC000000"
+        WindowStyle="None"
+        Height="500"
+        Width="850"
+        Title="WasHere">
+
+    <Grid>
+        <!-- Custom Title Bar -->
+        <Grid Height="30" VerticalAlignment="Top" Background="#444444" MouseDown="CustomTitleBar_MouseDown">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" Foreground="White" FontWeight="Bold" FontSize="16">WasHere</TextBlock>
+            <Button Grid.Column="1" Content="_" Width="30" Height="30" Click="MinimizeButton_Click"/>
+            <Button Grid.Column="2" Content="X" Width="30" Height="30" Click="CloseButton_Click"/>
+        </Grid>
+
+        <!-- Main Content -->
+        <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" Margin="0,30,0,0"/>
+    </Grid>
+</Window>
